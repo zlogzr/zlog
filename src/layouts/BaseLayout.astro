@@ -1,5 +1,6 @@
 ---
 import Header from '../components/Header.astro';
+import { withBase } from '../lib/url';
 import '../styles/global.css';
 
 interface Props {
@@ -17,7 +18,7 @@ const fullTitle = title ? `${title} · ${siteName}` : siteName;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
     <!-- 主题初始化，避免刷新闪烁 -->
     <script is:inline>
       const t = localStorage.getItem('theme') ||

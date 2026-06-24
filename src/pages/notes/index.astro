@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
 
 const notes = await getCollection('notes', ({ data }) => !data.draft);
 
@@ -25,7 +26,7 @@ for (const [, items] of categories) {
       <h2>{cat}</h2>
       {items.map((n) => (
         <article class="entry">
-          <h3><a href={`/notes/${n.id}`}>{n.data.title}</a></h3>
+          <h3><a href={withBase(`/notes/${n.id}`)}>{n.data.title}</a></h3>
           {n.data.description && <p>{n.data.description}</p>}
         </article>
       ))}

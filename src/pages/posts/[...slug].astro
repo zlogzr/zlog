@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
@@ -20,7 +21,7 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     </div>
     <Content />
   </article>
-  <p class="back"><a href="/posts">← 返回博客</a></p>
+  <p class="back"><a href={withBase('/posts')}>← 返回博客</a></p>
 </BaseLayout>
 
 <style>

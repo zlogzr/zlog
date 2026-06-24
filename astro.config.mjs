@@ -2,9 +2,10 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// 部署前把 site 改成你的正式域名，例如 https://yourname.dev
+// GitHub Pages 子路径部署：站点根域名 + 项目子路径
 export default defineConfig({
-  site: 'https://example.com',
+  site: 'https://zlogzr.github.io',
+  base: '/zlog',
   integrations: [sitemap()],
   markdown: {
     shikiConfig: {

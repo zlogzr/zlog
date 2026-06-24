@@ -1,14 +1,15 @@
 ---
+import { withBase } from '../lib/url';
 const path = Astro.url.pathname;
-const isActive = (p: string) => (path === p || path.startsWith(p + '/')) ? 'active' : '';
+const isActive = (p: string) => (path === withBase(p) || path.startsWith(withBase(p) + '/')) ? 'active' : '';
 ---
 <header>
   <div class="wrap bar">
-    <a href="/" class="brand">~/zlog</a>
+    <a href={withBase('/')} class="brand">~/zlog</a>
     <nav>
-      <a href="/posts" class={isActive('/posts')}>博客</a>
-      <a href="/notes" class={isActive('/notes')}>知识库</a>
-      <a href="/about" class={isActive('/about')}>关于</a>
+      <a href={withBase('/posts')} class={isActive('/posts')}>博客</a>
+      <a href={withBase('/notes')} class={isActive('/notes')}>知识库</a>
+      <a href={withBase('/about')} class={isActive('/about')}>关于</a>
       <button id="theme-toggle" aria-label="切换主题">◐</button>
     </nav>
   </div>
