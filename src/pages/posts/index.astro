@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+---
+<BaseLayout title="博客" description="文章与思考">
+  <h1>博客</h1>
+  {posts.map((p) => (
+    <article class="entry">
+      <h3><a href={`/posts/${p.id}`}>{p.data.title}</a></h3>
+      <div class="meta">
+        {fmt(p.data.date)}
+        {p.data.tags.map((t) => <span class="tag">{t}</span>)}
+      </div>
+      {p.data.description && <p>{p.data.description}</p>}
+    </article>
+  ))}
+</BaseLayout>

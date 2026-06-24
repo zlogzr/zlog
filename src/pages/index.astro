@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+---
+<BaseLayout description="记录重要知识点与个人思考的技术站点">
+  <section class="hero">
+    <h1>你好，我是 zlog 👋</h1>
+    <p>程序员。这里记录我认为重要的知识点，以及一些不成熟的思考。</p>
+    <p class="links">
+      <a href="/posts">读博客 →</a>
+      <a href="/notes">逛知识库 →</a>
+    </p>
+  </section>
+
+  <h2>最近的文章</h2>
+  {posts.length === 0 && <p style="color:var(--text-soft)">还没有文章，去 src/content/posts/ 写第一篇吧。</p>}
+  {posts.map((p) => (
+    <article class="entry">
+      <h3><a href={`/posts/${p.id}`}>{p.data.title}</a></h3>
+      <div class="meta">{fmt(p.data.date)}</div>
+      {p.data.description && <p>{p.data.description}</p>}
+    </article>
+  ))}
+</BaseLayout>
+
+<style>
+  .hero { padding: 24px 0 40px; }
+  .hero h1 { font-size: 2rem; margin: 0 0 12px; }
+  .hero p { color: var(--text-soft); margin: 0 0 8px; }
+  .links { margin-top: 16px; display: flex; gap: 20px; }
+</style>

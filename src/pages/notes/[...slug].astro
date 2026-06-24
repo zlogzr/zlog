@@ -1,0 +1,29 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const fmt = (d?: Date) => (d ? d.toISOString().slice(0, 10) : null);
+---
+<BaseLayout title={note.data.title} description={note.data.description}>
+  <article class="prose">
+    <div class="meta">
+      <span class="tag">{note.data.category}</span>
+      {note.data.updated && <span>更新于 {fmt(note.data.updated)}</span>}
+    </div>
+    <h1>{note.data.title}</h1>
+    <Content />
+  </article>
+  <p class="back"><a href="/notes">← 返回知识库</a></p>
+</BaseLayout>
+
+<style>
+  .meta { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .back { margin-top: 48px; }
+</style>

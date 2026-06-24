@@ -1,0 +1,29 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+---
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="prose">
+    <h1>{post.data.title}</h1>
+    <div class="meta">
+      {fmt(post.data.date)}
+      {post.data.tags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+    <Content />
+  </article>
+  <p class="back"><a href="/posts">← 返回博客</a></p>
+</BaseLayout>
+
+<style>
+  .meta { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 32px; }
+  .back { margin-top: 48px; }
+</style>

@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const notes = await getCollection('notes', ({ data }) => !data.draft);
+
+// 按分类分组
+const byCategory = new Map<string, typeof notes>();
+for (const n of notes) {
+  const c = n.data.category;
+  if (!byCategory.has(c)) byCategory.set(c, []);
+  byCategory.get(c)!.push(n);
+}
+const categories = [...byCategory.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+for (const [, items] of categories) {
+  items.sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
+}
+---
+<BaseLayout title="知识库" description="按主题整理的知识点">
+  <h1>知识库</h1>
+  <p style="color:var(--text-soft)">按主题沉淀的知识点，会持续更新。</p>
+  {categories.length === 0 && <p style="color:var(--text-soft)">还没有笔记，去 src/content/notes/ 添加吧。</p>}
+  {categories.map(([cat, items]) => (
+    <section class="cat">
+      <h2>{cat}</h2>
+      {items.map((n) => (
+        <article class="entry">
+          <h3><a href={`/notes/${n.id}`}>{n.data.title}</a></h3>
+          {n.data.description && <p>{n.data.description}</p>}
+        </article>
+      ))}
+    </section>
+  ))}
+</BaseLayout>
+
+<style>
+  .cat { margin-top: 32px; }
+</style>

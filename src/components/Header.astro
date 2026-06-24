@@ -1,0 +1,35 @@
+---
+const path = Astro.url.pathname;
+const isActive = (p: string) => (path === p || path.startsWith(p + '/')) ? 'active' : '';
+---
+<header>
+  <div class="wrap bar">
+    <a href="/" class="brand">~/zlog</a>
+    <nav>
+      <a href="/posts" class={isActive('/posts')}>博客</a>
+      <a href="/notes" class={isActive('/notes')}>知识库</a>
+      <a href="/about" class={isActive('/about')}>关于</a>
+      <button id="theme-toggle" aria-label="切换主题">◐</button>
+    </nav>
+  </div>
+</header>
+
+<style>
+  header { border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .brand { font-family: var(--font-mono); font-weight: 700; color: var(--text); }
+  nav { display: flex; align-items: center; gap: 18px; }
+  nav a { color: var(--text-soft); font-size: 0.95rem; }
+  nav a.active { color: var(--text); font-weight: 600; }
+  #theme-toggle { background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--text-soft); padding: 4px; }
+</style>
+
+<script is:inline>
+  const btn = document.getElementById('theme-toggle');
+  btn?.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+</script>

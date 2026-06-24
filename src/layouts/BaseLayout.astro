@@ -1,0 +1,40 @@
+---
+import Header from '../components/Header.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+const siteName = 'zlog 的技术笔记';
+const fullTitle = title ? `${title} · ${siteName}` : siteName;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- 主题初始化，避免刷新闪烁 -->
+    <script is:inline>
+      const t = localStorage.getItem('theme') ||
+        (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    </script>
+  </head>
+  <body>
+    <Header />
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="wrap">
+      <p>© {new Date().getFullYear()} zlog · Built with Astro</p>
+    </footer>
+    <style>
+      footer { border-top: 1px solid var(--border); padding: 24px 20px; color: var(--text-soft); font-size: 0.85rem; }
+    </style>
+  </body>
+</html>
