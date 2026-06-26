@@ -92,3 +92,8 @@ main { padding: 40px 0 80px; }
   padding: 1px 10px;
   margin-right: 6px;
 }
+a.tag:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}

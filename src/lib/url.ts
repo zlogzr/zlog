@@ -6,3 +6,8 @@ export function withBase(path = '/'): string {
   const p = path.startsWith('/') ? path : `/${path}`;
   return `${b}${p}`; // withBase('/') -> '/zlog/'
 }
+
+/** 标签页链接。标签含中文，需对路径段做 URL 编码。 */
+export function tagUrl(tag: string): string {
+  return withBase(`/tags/${encodeURIComponent(tag)}`);
+}

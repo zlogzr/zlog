@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { tagUrl } from '../../lib/url';
+
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+
+// 统计每个标签的文章数
+const counts = new Map<string, number>();
+for (const p of posts) {
+  for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+}
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+---
+<BaseLayout title="标签" description="按标签浏览全部文章">
+  <h1>标签</h1>
+  <p style="color:var(--text-soft)">按主题浏览文章，共 {tags.length} 个标签。</p>
+  {tags.length === 0 && <p style="color:var(--text-soft)">还没有带标签的文章。</p>}
+  <div class="cloud">
+    {tags.map(([tag, count]) => (
+      <a class="tag-item" href={tagUrl(tag)}>
+        {tag}<span class="count">{count}</span>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .cloud { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    font-size: 0.95rem;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .tag-item:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+  .count {
+    font-size: 0.75rem;
+    color: var(--text-soft);
+    background: var(--bg-soft);
+    border-radius: 999px;
+    padding: 0 7px;
+    min-width: 18px;
+    text-align: center;
+  }
+</style>

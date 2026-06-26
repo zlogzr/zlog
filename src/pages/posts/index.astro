@@ -1,22 +1,31 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { withBase } from '../../lib/url';
+import { withBase, tagUrl } from '../../lib/url';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const fmt = (d: Date) => d.toISOString().slice(0, 10);
 ---
 <BaseLayout title="博客" description="文章与思考">
-  <h1>博客</h1>
+  <div class="head">
+    <h1>博客</h1>
+    <a href={withBase('/tags')} class="by-tag">🏷 按标签浏览</a>
+  </div>
   {posts.map((p) => (
     <article class="entry">
       <h3><a href={withBase(`/posts/${p.id}`)}>{p.data.title}</a></h3>
       <div class="meta">
         {fmt(p.data.date)}
-        {p.data.tags.map((t) => <span class="tag">{t}</span>)}
+        {p.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
       </div>
       {p.data.description && <p>{p.data.description}</p>}
     </article>
   ))}
 </BaseLayout>
+
+<style>
+  .head { display: flex; align-items: baseline; justify-content: space-between; }
+  .head h1 { margin: 0; }
+  .by-tag { font-size: 0.9rem; color: var(--text-soft); }
+</style>

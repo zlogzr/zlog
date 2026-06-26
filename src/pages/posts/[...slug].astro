@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
-import { withBase } from '../../lib/url';
+import { withBase, tagUrl } from '../../lib/url';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
@@ -18,7 +18,7 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     <h1>{post.data.title}</h1>
     <div class="meta">
       {fmt(post.data.date)}
-      {post.data.tags.map((t) => <span class="tag">{t}</span>)}
+      {post.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
     </div>
     <Content />
   </article>

@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase, tagUrl } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+  return tags.map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts
+        .filter((p) => p.data.tags.includes(tag))
+        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+---
+<BaseLayout title={`标签：${tag}`} description={`「${tag}」标签下的全部文章`}>
+  <p class="crumb"><a href={withBase('/tags')}>标签</a> / {tag}</p>
+  <h1>#{tag}</h1>
+  <p style="color:var(--text-soft)">共 {posts.length} 篇文章。</p>
+  {posts.map((p) => (
+    <article class="entry">
+      <h3><a href={withBase(`/posts/${p.id}`)}>{p.data.title}</a></h3>
+      <div class="meta">
+        {fmt(p.data.date)}
+        {p.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
+      </div>
+      {p.data.description && <p>{p.data.description}</p>}
+    </article>
+  ))}
+  <p class="back"><a href={withBase('/tags')}>← 全部标签</a></p>
+</BaseLayout>
+
+<style>
+  .crumb { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 4px; }
+  .crumb a { color: var(--text-soft); }
+  h1 { margin-top: 0; }
+  .back { margin-top: 40px; }
+</style>
