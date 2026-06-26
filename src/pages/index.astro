@@ -3,35 +3,126 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { withBase } from '../lib/url';
 
-const posts = (await getCollection('posts', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 5);
+const allPosts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const recentPosts = allPosts.slice(0, 5);
+const latestPost = allPosts[0];
+
+const notes = await getCollection('notes', ({ data }) => !data.draft);
+const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =>
+  a.localeCompare(b),
+);
+
 const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
+const GITHUB = 'https://github.com/zlogzr';
+const EMAIL = 'zhangyang@best-short.com';
 ---
 <BaseLayout description="记录重要知识点与个人思考的技术站点">
   <section class="hero">
-    <h1>你好，我是 zlog 👋</h1>
-    <p>程序员。这里记录我认为重要的知识点，以及一些不成熟的思考。</p>
-    <p class="links">
-      <a href={withBase('/posts')}>读博客 →</a>
-      <a href={withBase('/notes')}>逛知识库 →</a>
-    </p>
+    <h1>你好，我是 zlog <span class="wave">👋</span></h1>
+    <p class="role">一名程序员</p>
+    <p class="bio">这里记录我认为重要的知识点，以及一些不成熟的思考。比起追新，我更在意把一件事真正想清楚。</p>
+    <nav class="hero-links">
+      <a href={GITHUB} target="_blank" rel="noopener">GitHub</a>
+      <span class="dot">·</span>
+      <a href={withBase('/rss.xml')}>RSS</a>
+      <span class="dot">·</span>
+      <a href={`mailto:${EMAIL}`}>邮箱</a>
+    </nav>
   </section>
 
-  <h2>最近的文章</h2>
-  {posts.length === 0 && <p style="color:var(--text-soft)">还没有文章，去 src/content/posts/ 写第一篇吧。</p>}
-  {posts.map((p) => (
-    <article class="entry">
-      <h3><a href={withBase(`/posts/${p.id}`)}>{p.data.title}</a></h3>
-      <div class="meta">{fmt(p.data.date)}</div>
-      {p.data.description && <p>{p.data.description}</p>}
-    </article>
-  ))}
+  <section class="cards">
+    <a class="card" href={withBase('/posts')}>
+      <div class="card-top">
+        <span class="card-icon">✍️</span>
+        <h2>博客</h2>
+      </div>
+      <p class="card-desc">带时间线的文章与思考。</p>
+      <div class="card-meta">
+        {allPosts.length} 篇文章
+        {latestPost && <> · 最新：{latestPost.data.title}</>}
+      </div>
+      <span class="card-foot">浏览全部 →</span>
+    </a>
+
+    <a class="card" href={withBase('/notes')}>
+      <div class="card-top">
+        <span class="card-icon">📚</span>
+        <h2>知识库</h2>
+      </div>
+      <p class="card-desc">按主题沉淀、会反复修订的知识点。</p>
+      <div class="card-meta">{notes.length} 条笔记 · {categories.length} 个分类</div>
+      <div class="cat-tags">
+        {categories.map((c) => <span class="tag">{c}</span>)}
+      </div>
+      <span class="card-foot">浏览全部 →</span>
+    </a>
+  </section>
+
+  <section class="recent">
+    <div class="section-head">
+      <h2>最近的文章</h2>
+      <a href={withBase('/posts')} class="more">全部 →</a>
+    </div>
+    {recentPosts.length === 0 && (
+      <p style="color:var(--text-soft)">还没有文章，去 src/content/posts/ 写第一篇吧。</p>
+    )}
+    {recentPosts.map((p) => (
+      <article class="entry">
+        <h3><a href={withBase(`/posts/${p.id}`)}>{p.data.title}</a></h3>
+        <div class="meta">
+          {fmt(p.data.date)}
+          {p.data.tags.map((t) => <span class="tag">{t}</span>)}
+        </div>
+        {p.data.description && <p>{p.data.description}</p>}
+      </article>
+    ))}
+  </section>
 </BaseLayout>
 
 <style>
-  .hero { padding: 24px 0 40px; }
-  .hero h1 { font-size: 2rem; margin: 0 0 12px; }
-  .hero p { color: var(--text-soft); margin: 0 0 8px; }
-  .links { margin-top: 16px; display: flex; gap: 20px; }
+  .hero { padding: 32px 0 36px; }
+  .hero h1 { font-size: 2.2rem; margin: 0 0 6px; }
+  .wave { display: inline-block; }
+  .role { color: var(--text-soft); margin: 0 0 16px; font-size: 1rem; }
+  .bio { color: var(--text-soft); margin: 0; max-width: 38em; line-height: 1.8; }
+  .hero-links { margin-top: 20px; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; }
+  .hero-links .dot { color: var(--border); }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 8px 0 48px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
+  .card-top { display: flex; align-items: center; gap: 10px; }
+  .card-icon { font-size: 1.4rem; }
+  .card h2 { margin: 0; font-size: 1.25rem; }
+  .card-desc { color: var(--text-soft); margin: 12px 0 10px; font-size: 0.95rem; }
+  .card-meta { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 12px; }
+  .cat-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .card-foot { margin-top: auto; color: var(--accent); font-size: 0.9rem; font-weight: 500; }
+
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; }
+  .section-head h2 { margin: 0; }
+  .more { font-size: 0.9rem; color: var(--text-soft); }
+  .recent .entry:first-of-type { border-top: 1px solid var(--border); margin-top: 12px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
 </style>
