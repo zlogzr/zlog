@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
 import { withBase, tagUrl } from '../../lib/url';
 
 export async function getStaticPaths() {
@@ -10,10 +11,11 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const fmt = (d: Date) => d.toISOString().slice(0, 10);
 ---
 <BaseLayout title={post.data.title} description={post.data.description}>
+  <TableOfContents headings={headings} />
   <article class="prose" data-pagefind-body>
     <h1>{post.data.title}</h1>
     <div class="meta">
