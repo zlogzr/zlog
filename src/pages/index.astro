@@ -17,13 +17,13 @@ const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =
 const fmt = (d: Date) => d.toISOString().slice(0, 10);
 
 const GITHUB = 'https://github.com/zlogzr';
-const EMAIL = 'zhangyang@best-short.com';
+const EMAIL = 'zylogzr@163.com';
 ---
 <BaseLayout description="记录重要知识点与个人思考的技术站点">
   <section class="hero">
     <h1>你好，我是 zlog <span class="wave">👋</span></h1>
-    <p class="role">一名程序员</p>
-    <p class="bio">这里记录我认为重要的知识点，以及一些不成熟的思考。比起追新，我更在意把一件事真正想清楚。</p>
+    <p class="role">写代码的人</p>
+    <p class="bio">这里存放我踩过的坑、想明白的事，和还没想明白的问题。</p>
     <nav class="hero-links">
       <a href={GITHUB} target="_blank" rel="noopener">GitHub</a>
       <span class="dot">·</span>
