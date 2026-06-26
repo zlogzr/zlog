@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
 import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
@@ -13,7 +14,7 @@ const { Content } = await render(note);
 const fmt = (d?: Date) => (d ? d.toISOString().slice(0, 10) : null);
 ---
 <BaseLayout title={note.data.title} description={note.data.description}>
-  <article class="prose">
+  <article class="prose" data-pagefind-body>
     <div class="meta">
       <span class="tag">{note.data.category}</span>
       {note.data.updated && <span>更新于 {fmt(note.data.updated)}</span>}
@@ -21,6 +22,7 @@ const fmt = (d?: Date) => (d ? d.toISOString().slice(0, 10) : null);
     <h1>{note.data.title}</h1>
     <Content />
   </article>
+  <Comments />
   <p class="back"><a href={withBase('/notes')}>← 返回知识库</a></p>
 </BaseLayout>
 

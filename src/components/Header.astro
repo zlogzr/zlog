@@ -32,5 +32,6 @@ const isActive = (p: string) => (path === withBase(p) || path.startsWith(withBas
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
+    window.dispatchEvent(new CustomEvent('theme-change', { detail: next }));
   });
 </script>

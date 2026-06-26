@@ -1,0 +1,57 @@
+---
+// 基于 Pagefind 经典 UI 的全文搜索框。
+// 索引由 astro.config 里的 pagefind() 集成在构建时生成。
+import { withBase } from '../lib/url';
+
+const cssHref = withBase('/pagefind/pagefind-ui.css');
+const jsSrc = withBase('/pagefind/pagefind-ui.js');
+const bundlePath = withBase('/pagefind/');
+---
+<link rel="stylesheet" href={cssHref} />
+<div id="search" class="pf-search"></div>
+
+<style is:global>
+  /* 让 Pagefind UI 跟随站点主题 */
+  .pf-search .pagefind-ui {
+    --pagefind-ui-primary: var(--accent);
+    --pagefind-ui-text: var(--text);
+    --pagefind-ui-background: var(--bg);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-tag: var(--bg-soft);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-font: var(--font-sans);
+  }
+</style>
+
+<script is:inline define:vars={{ jsSrc, bundlePath }}>
+  (function () {
+    function init() {
+      new window.PagefindUI({
+        element: '#search',
+        bundlePath: bundlePath,
+        showImages: false,
+        showSubResults: true,
+        excerptLength: 15,
+        translations: {
+          placeholder: '搜索知识库与博客…',
+          clear_search: '清除',
+          load_more: '加载更多结果',
+          search_label: '站内搜索',
+          zero_results: '没有找到关于「[SEARCH_TERM]」的内容',
+          many_results: '找到 [COUNT] 条关于「[SEARCH_TERM]」的结果',
+          one_result: '找到 [COUNT] 条关于「[SEARCH_TERM]」的结果',
+          searching: '正在搜索「[SEARCH_TERM]」…',
+        },
+      });
+    }
+    if (window.PagefindUI) {
+      init();
+    } else {
+      const s = document.createElement('script');
+      s.src = jsSrc;
+      s.onload = init;
+      document.head.appendChild(s);
+    }
+  })();
+</script>

@@ -19,6 +19,7 @@ const fullTitle = title ? `${title} · ${siteName}` : siteName;
     <title>{fullTitle}</title>
     {description && <meta name="description" content={description} />}
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={siteName} href={withBase('/rss.xml')} />
     <!-- 主题初始化，避免刷新闪烁 -->
     <script is:inline>
       const t = localStorage.getItem('theme') ||
@@ -32,7 +33,7 @@ const fullTitle = title ? `${title} · ${siteName}` : siteName;
       <slot />
     </main>
     <footer class="wrap">
-      <p>© {new Date().getFullYear()} zlog · Built with Astro</p>
+      <p>© {new Date().getFullYear()} zlog · Built with Astro · <a href={withBase('/rss.xml')}>RSS</a></p>
     </footer>
     <style>
       footer { border-top: 1px solid var(--border); padding: 24px 20px; color: var(--text-soft); font-size: 0.85rem; }

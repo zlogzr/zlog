@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
 import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
@@ -13,7 +14,7 @@ const { Content } = await render(post);
 const fmt = (d: Date) => d.toISOString().slice(0, 10);
 ---
 <BaseLayout title={post.data.title} description={post.data.description}>
-  <article class="prose">
+  <article class="prose" data-pagefind-body>
     <h1>{post.data.title}</h1>
     <div class="meta">
       {fmt(post.data.date)}
@@ -21,6 +22,7 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     </div>
     <Content />
   </article>
+  <Comments />
   <p class="back"><a href={withBase('/posts')}>← 返回博客</a></p>
 </BaseLayout>
 

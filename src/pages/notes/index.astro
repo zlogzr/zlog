@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Search from '../../components/Search.astro';
 import { withBase } from '../../lib/url';
 
 const notes = await getCollection('notes', ({ data }) => !data.draft);
@@ -20,6 +21,9 @@ for (const [, items] of categories) {
 <BaseLayout title="知识库" description="按主题整理的知识点">
   <h1>知识库</h1>
   <p style="color:var(--text-soft)">按主题沉淀的知识点，会持续更新。</p>
+  <div class="search">
+    <Search />
+  </div>
   {categories.length === 0 && <p style="color:var(--text-soft)">还没有笔记，去 src/content/notes/ 添加吧。</p>}
   {categories.map(([cat, items]) => (
     <section class="cat">
@@ -36,4 +40,5 @@ for (const [, items] of categories) {
 
 <style>
   .cat { margin-top: 32px; }
+  .search { margin: 20px 0 8px; }
 </style>
