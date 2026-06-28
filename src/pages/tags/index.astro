@@ -5,47 +5,78 @@ import { tagUrl } from '../../lib/url';
 
 const posts = await getCollection('posts', ({ data }) => !data.draft);
 
-// 统计每个标签的文章数
 const counts = new Map<string, number>();
 for (const p of posts) {
   for (const t of p.data.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
 }
-const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
+const max = Math.max(1, ...counts.values());
 ---
 <BaseLayout title="标签" description="按标签浏览全部文章">
-  <h1>标签</h1>
-  <p style="color:var(--text-soft)">按主题浏览文章，共 {tags.length} 个标签。</p>
-  {tags.length === 0 && <p style="color:var(--text-soft)">还没有带标签的文章。</p>}
+  <div class="page-head">
+    <p class="eyebrow mono">// tags</p>
+    <h1>标签</h1>
+    <p class="lede">按主题浏览文章，共 {tags.length} 个标签。</p>
+  </div>
+
+  {tags.length === 0 && <p class="empty">还没有带标签的文章。</p>}
+
   <div class="cloud">
     {tags.map(([tag, count]) => (
-      <a class="tag-item" href={tagUrl(tag)}>
-        {tag}<span class="count">{count}</span>
+      <a
+        class="tag-item"
+        href={tagUrl(tag)}
+        style={`--weight: ${0.85 + (count / max) * 0.5}`}
+      >
+        <span class="hash">#</span>{tag}<span class="count">{count}</span>
       </a>
     ))}
   </div>
 </BaseLayout>
 
 <style>
-  .cloud { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .empty {
+    color: var(--text-soft);
+  }
+  .cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: var(--space-5);
+  }
   .tag-item {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
+    gap: 0.45rem;
+    padding: 0.4rem 0.9rem;
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: var(--radius-full);
     color: var(--text);
-    font-size: 0.95rem;
-    transition: border-color 0.2s, color 0.2s;
+    font-size: calc(var(--step-0) * var(--weight, 1));
+    transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+      background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
   }
-  .tag-item:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+  .tag-item:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+    transform: translateY(-2px);
+  }
+  .hash {
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+  }
+  .tag-item:hover .hash {
+    color: var(--accent);
+  }
   .count {
-    font-size: 0.75rem;
-    color: var(--text-soft);
-    background: var(--bg-soft);
-    border-radius: 999px;
-    padding: 0 7px;
-    min-width: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    color: var(--text-faint);
+    background: var(--bg-subtle);
+    border-radius: var(--radius-full);
+    padding: 0 0.5rem;
+    min-width: 1.4em;
     text-align: center;
   }
 </style>

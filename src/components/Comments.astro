@@ -17,31 +17,43 @@
     const giscusTheme = () =>
       document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
 
-    const s = document.createElement('script');
-    s.src = 'https://giscus.app/client.js';
-    s.setAttribute('data-repo', 'zlogzr/zlog');
-    s.setAttribute('data-repo-id', 'R_kgDOTDyVLw');
-    s.setAttribute('data-category', 'Announcements');
-    s.setAttribute('data-category-id', 'DIC_kwDOTDyVL84C_63E');
-    s.setAttribute('data-mapping', 'pathname');
-    s.setAttribute('data-strict', '0');
-    s.setAttribute('data-reactions-enabled', '1');
-    s.setAttribute('data-emit-metadata', '0');
-    s.setAttribute('data-input-position', 'bottom');
-    s.setAttribute('data-theme', giscusTheme());
-    s.setAttribute('data-lang', 'zh-CN');
-    s.setAttribute('data-loading', 'lazy');
-    s.crossOrigin = 'anonymous';
-    s.async = true;
-    document.getElementById('giscus-container')?.appendChild(s);
+    // Load giscus into the (fresh) container for the current article. Guarded so
+    // View Transitions don't double-load, and re-run per navigation.
+    function load() {
+      const c = document.getElementById('giscus-container');
+      if (!c || c.dataset.loaded) return;
+      c.dataset.loaded = '1';
+      const s = document.createElement('script');
+      s.src = 'https://giscus.app/client.js';
+      s.setAttribute('data-repo', 'zlogzr/zlog');
+      s.setAttribute('data-repo-id', 'R_kgDOTDyVLw');
+      s.setAttribute('data-category', 'Announcements');
+      s.setAttribute('data-category-id', 'DIC_kwDOTDyVL84C_63E');
+      s.setAttribute('data-mapping', 'pathname');
+      s.setAttribute('data-strict', '0');
+      s.setAttribute('data-reactions-enabled', '1');
+      s.setAttribute('data-emit-metadata', '0');
+      s.setAttribute('data-input-position', 'bottom');
+      s.setAttribute('data-theme', giscusTheme());
+      s.setAttribute('data-lang', 'zh-CN');
+      s.setAttribute('data-loading', 'lazy');
+      s.crossOrigin = 'anonymous';
+      s.async = true;
+      c.appendChild(s);
+    }
 
-    // 跟随站点深浅色切换
-    window.addEventListener('theme-change', () => {
-      const iframe = document.querySelector('iframe.giscus-frame');
-      iframe?.contentWindow?.postMessage(
-        { giscus: { setConfig: { theme: giscusTheme() } } },
-        'https://giscus.app',
-      );
-    });
+    if (!window.__giscusBound) {
+      window.__giscusBound = true;
+      document.addEventListener('astro:page-load', load);
+      // 跟随站点深浅色切换
+      window.addEventListener('theme-change', () => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        iframe?.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme: giscusTheme() } } },
+          'https://giscus.app',
+        );
+      });
+    }
+    load();
   })();
 </script>

@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+---
+<BaseLayout title="404 · 页面走丢了" noindex>
+  <section class="notfound">
+    <p class="big mono" aria-hidden="true">404</p>
+    <h1>页面走丢了</h1>
+    <div class="terminal mono" role="img" aria-label="终端：没有那个文件或目录">
+      <span class="prompt">~/zlog</span>
+      <span class="cmd">$ open <span id="missing-path">.</span></span>
+      <span class="err">zsh: no such file or directory</span>
+    </div>
+    <p class="hint">你要找的页面不存在，或者已经被移动了。试试这些：</p>
+    <div class="actions">
+      <a class="btn btn--primary" href={withBase('/')}>回首页</a>
+      <a class="btn" href={withBase('/posts')}>看博客</a>
+      <a class="btn" href={withBase('/notes')}>逛知识库</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  (function () {
+    var el = document.getElementById('missing-path');
+    if (el) el.textContent = '.' + location.pathname;
+  })();
+</script>
+
+<style>
+  .notfound {
+    padding-block: clamp(2rem, 8vw, 5rem);
+    max-width: 34rem;
+  }
+  .big {
+    font-size: clamp(4rem, 18vw, 8rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 45%, var(--text)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+  }
+  .notfound h1 {
+    margin: 0.5rem 0 1.3rem;
+    font-size: var(--step-3);
+  }
+  .terminal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--code-bg);
+    font-size: var(--step--1);
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+  }
+  .terminal .prompt {
+    color: var(--accent);
+  }
+  .terminal .cmd {
+    color: var(--text);
+  }
+  .terminal .err {
+    color: #e5534b;
+  }
+  .hint {
+    margin: 1.4rem 0 1.2rem;
+    color: var(--text-soft);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+</style>

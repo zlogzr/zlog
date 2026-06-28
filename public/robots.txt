@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zlogzr.github.io/zlog/sitemap-index.xml

@@ -1,42 +1,209 @@
 ---
+import '@fontsource-variable/inter/opsz.css';
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import { withBase } from '../lib/url';
-import '../styles/global.css';
+import { SITE, AUTHOR } from '../lib/site';
 
 interface Props {
   title?: string;
   description?: string;
+  /** 'article' emits article-specific OG + JSON-LD. */
+  type?: 'website' | 'article';
+  /** Publish / update dates for articles. */
+  date?: Date;
+  updated?: Date;
+  tags?: string[];
+  /** Absolute or site-relative social card image. */
+  image?: string;
+  noindex?: boolean;
 }
-const { title, description } = Astro.props;
-const siteName = 'zlog 的技术笔记';
-const fullTitle = title ? `${title} · ${siteName}` : siteName;
+
+const {
+  title,
+  description = SITE.description,
+  type = 'website',
+  date,
+  updated,
+  tags = [],
+  image = '/og.png',
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} · 工程实践与技术思考`;
+
+// Absolute URLs for canonical + social tags.
+const canonical = new URL(Astro.url.pathname, SITE.origin).href;
+const socialImage = image
+  ? new URL(image.startsWith('http') ? image : withBase(image), SITE.origin).href
+  : undefined;
+const fmtISO = (d?: Date) => (d ? d.toISOString() : undefined);
+
+// JSON-LD structured data — improves how search engines render results.
+const orgLogo = new URL(withBase('/favicon.svg'), SITE.origin).href;
+const jsonLd =
+  type === 'article'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: title,
+        description,
+        inLanguage: SITE.locale,
+        datePublished: fmtISO(date),
+        dateModified: fmtISO(updated ?? date),
+        keywords: tags.join(', ') || undefined,
+        author: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.github },
+        publisher: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.github },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+        ...(socialImage ? { image: socialImage } : {}),
+      }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: SITE.name,
+        description: SITE.description,
+        inLanguage: SITE.locale,
+        url: new URL(withBase('/'), SITE.origin).href,
+        author: { '@type': 'Person', name: AUTHOR.name, url: AUTHOR.github },
+      };
 ---
+
 <!doctype html>
-<html lang="zh-CN">
+<html lang={SITE.locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
     <title>{fullTitle}</title>
-    {description && <meta name="description" content={description} />}
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="author" content={AUTHOR.name} />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0e13" media="(prefers-color-scheme: dark)" />
+
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={siteName} href={withBase('/rss.xml')} />
-    <!-- 主题初始化，避免刷新闪烁 -->
+    <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href={withBase('/rss.xml')} />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.ogLocale} />
+    <meta property="og:title" content={title ?? SITE.name} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {socialImage && <meta property="og:image" content={socialImage} />}
+    {socialImage && <meta property="og:image:width" content="1200" />}
+    {socialImage && <meta property="og:image:height" content="630" />}
+    {type === 'article' && date && <meta property="article:published_time" content={fmtISO(date)} />}
+    {type === 'article' && (updated ?? date) && (
+      <meta property="article:modified_time" content={fmtISO(updated ?? date)} />
+    )}
+    {type === 'article' && tags.map((t) => <meta property="article:tag" content={t} />)}
+
+    <!-- Twitter / X card -->
+    <meta name="twitter:card" content={socialImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title ?? SITE.name} />
+    <meta name="twitter:description" content={description} />
+    {socialImage && <meta name="twitter:image" content={socialImage} />}
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Set theme before paint to avoid a flash; survive view transitions. -->
     <script is:inline>
-      const t = localStorage.getItem('theme') ||
-        (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', t);
+      (function () {
+        // Mark JS-capable so reveal-on-scroll can hide content pre-animation.
+        document.documentElement.classList.add('js');
+        const KEY = 'theme';
+        const pref = () =>
+          localStorage.getItem(KEY) ||
+          (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const apply = (t) => {
+          document.documentElement.setAttribute('data-theme', t);
+          document.documentElement.style.colorScheme = t;
+        };
+        apply(pref());
+        window.__setTheme = (t) => {
+          localStorage.setItem(KEY, t);
+          apply(t);
+          window.dispatchEvent(new CustomEvent('theme-change', { detail: t }));
+        };
+        if (!window.__themeBound) {
+          window.__themeBound = true;
+          // Delegated so it keeps working across View Transitions / re-renders.
+          document.addEventListener('click', (e) => {
+            const btn = e.target.closest('#theme-toggle');
+            if (!btn) return;
+            const cur = document.documentElement.getAttribute('data-theme');
+            window.__setTheme(cur === 'dark' ? 'light' : 'dark');
+          });
+          document.addEventListener('astro:after-swap', () => apply(pref()));
+        }
+      })();
     </script>
+
+    <ClientRouter />
   </head>
   <body>
+    <a href="#main" class="skip-link">跳到主内容</a>
     <Header />
-    <main class="wrap">
+    <main id="main" class="wrap">
       <slot />
     </main>
-    <footer class="wrap">
-      <p>© {new Date().getFullYear()} zlog · Built with Astro · <a href={withBase('/rss.xml')}>RSS</a></p>
+    <footer>
+      <div class="wrap foot">
+        <p class="foot-brand"><span class="mono">~/zlog</span> · 工程实践与技术思考</p>
+        <nav class="foot-links" aria-label="页脚">
+          <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href={withBase('/rss.xml')}>RSS</a>
+          <a href={`mailto:${AUTHOR.email}`}>邮箱</a>
+        </nav>
+        <p class="foot-copy">© {new Date().getFullYear()} {AUTHOR.name} · Built with Astro</p>
+      </div>
     </footer>
+
     <style>
-      footer { border-top: 1px solid var(--border); padding: 24px 20px; color: var(--text-soft); font-size: 0.85rem; }
+      footer {
+        flex-shrink: 0;
+        border-top: 1px solid var(--border);
+        margin-top: var(--space-9);
+        padding-block: var(--space-6);
+        color: var(--text-faint);
+        font-size: var(--step--1);
+      }
+      .foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem 1.4rem;
+      }
+      .foot-brand {
+        color: var(--text-soft);
+      }
+      .foot-links {
+        display: flex;
+        gap: 1.1rem;
+      }
+      .foot-links a {
+        color: var(--text-soft);
+      }
+      .foot-links a:hover {
+        color: var(--accent);
+      }
+      .foot-copy {
+        margin-left: auto;
+      }
+      @media (max-width: 560px) {
+        .foot-copy {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
     </style>
+
   </body>
 </html>

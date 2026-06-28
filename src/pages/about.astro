@@ -1,14 +1,140 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { AUTHOR } from '../lib/site';
+import { withBase } from '../lib/url';
+
+const stack = [
+  { name: 'Astro', note: '内容驱动的静态站点' },
+  { name: 'TypeScript', note: '类型即文档' },
+  { name: 'CSS 设计系统', note: 'Design tokens · 双主题' },
+  { name: 'View Transitions', note: '原生页面过渡' },
+  { name: 'Pagefind', note: '纯前端全文搜索' },
+  { name: 'GitHub Actions', note: 'push 即部署' },
+];
+
+const principles = [
+  { t: '把问题想清楚，再写代码', d: '大多数 bug 不是打错字，而是一开始就没想明白要解决什么。' },
+  { t: '简单优先于聪明', d: '能被同事一眼看懂的代码，比炫技的代码更有长期价值。' },
+  { t: '为后果负责', d: '写下的每一行都要被运行、被监控、被半夜叫醒去修——所以慎重。' },
+];
 ---
-<BaseLayout title="关于" description="关于我">
-  <article class="prose">
+<BaseLayout title="关于" description="关于 zlog：一名在意工程质量与长期价值的前端工程师。">
+  <div class="page-head">
+    <p class="eyebrow mono">// about</p>
     <h1>关于</h1>
-    <p>我是 zlog，一名程序员。这个站点用来记录：</p>
-    <ul>
-      <li><strong>知识点</strong>：工作和学习中值得沉淀下来的东西。</li>
-      <li><strong>思考</strong>：对技术、工程、职业的一些想法。</li>
-    </ul>
-    <p>联系我：<a href="mailto:zylogzr@163.com">zylogzr@163.com</a></p>
+  </div>
+
+  <article class="prose">
+    <p>
+      你好，我是 <strong>{AUTHOR.name}</strong>，一名{AUTHOR.role}。我喜欢把复杂的东西做简单，
+      也喜欢把想明白的事写下来。这个站点是我的<strong>博客</strong>和<strong>知识库</strong>——
+      前者记录带时间线的思考，后者沉淀会反复修订的知识点。
+    </p>
+    <p>
+      比起追逐新框架，我更在意那些不太变的东西：清晰的抽象、可维护的代码、
+      以及在约束下做出正确取舍的判断力。
+    </p>
+
+    <h2>我相信的几件事</h2>
+  </article>
+
+  <ul class="principles">
+    {principles.map((p) => (
+      <li class="principle">
+        <h3>{p.t}</h3>
+        <p>{p.d}</p>
+      </li>
+    ))}
+  </ul>
+
+  <article class="prose">
+    <h2>这个站点怎么搭的</h2>
+    <p>
+      站点本身也是一份作品集——从设计系统到部署流水线，完全自托管、无第三方追踪。
+      技术选型刻意克制，追求快、稳、可维护：
+    </p>
+  </article>
+
+  <ul class="stack">
+    {stack.map((s) => (
+      <li class="chip">
+        <span class="chip-name mono">{s.name}</span>
+        <span class="chip-note">{s.note}</span>
+      </li>
+    ))}
+  </ul>
+
+  <article class="prose">
+    <h2>聊聊</h2>
+    <p>
+      欢迎就文章里的任何观点和我交流——每篇文末都可以评论。也可以直接找我：
+    </p>
+    <p class="contact">
+      <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      <a href={`mailto:${AUTHOR.email}`}>{AUTHOR.email}</a>
+      <a href={withBase('/rss.xml')}>RSS</a>
+    </p>
   </article>
 </BaseLayout>
+
+<style>
+  .principles {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .principle {
+    padding: 1.1rem 1.3rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--bg-subtle);
+  }
+  .principle h3 {
+    margin: 0;
+    font-size: var(--step-0);
+  }
+  .principle p {
+    margin: 0.35rem 0 0;
+    color: var(--text-soft);
+    font-size: var(--step--1);
+  }
+
+  .stack {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.7rem;
+  }
+  .chip {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.7rem 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+  .chip:hover {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  }
+  .chip-name {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .chip-note {
+    font-size: var(--step--1);
+    color: var(--text-faint);
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+  }
+</style>

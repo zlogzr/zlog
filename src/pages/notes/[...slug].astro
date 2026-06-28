@@ -3,32 +3,99 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import ReadingProgress from '../../components/ReadingProgress.astro';
+import ProseEnhancer from '../../components/ProseEnhancer.astro';
+import PrevNext from '../../components/PrevNext.astro';
 import { withBase } from '../../lib/url';
+import { formatDate, isoDateTime, readingTime } from '../../lib/format';
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes', ({ data }) => !data.draft);
-  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+  const sortInCat = (a: (typeof notes)[number], b: (typeof notes)[number]) =>
+    a.data.order - b.data.order || a.data.title.localeCompare(b.data.title, 'zh');
+
+  return notes.map((note) => {
+    const siblings = notes
+      .filter((n) => n.data.category === note.data.category)
+      .sort(sortInCat);
+    const i = siblings.findIndex((n) => n.id === note.id);
+    return {
+      params: { slug: note.id },
+      props: {
+        note,
+        prev: i > 0 ? siblings[i - 1] : null,
+        next: i < siblings.length - 1 ? siblings[i + 1] : null,
+      },
+    };
+  });
 }
 
-const { note } = Astro.props;
+const { note, prev, next } = Astro.props;
 const { Content, headings } = await render(note);
-const fmt = (d?: Date) => (d ? d.toISOString().slice(0, 10) : null);
+const minutes = readingTime(note.body ?? '');
+
+const toItem = (n: typeof note | null) =>
+  n ? { href: withBase(`/notes/${n.id}`), title: n.data.title } : null;
 ---
-<BaseLayout title={note.data.title} description={note.data.description}>
+<BaseLayout
+  title={note.data.title}
+  description={note.data.description}
+  type="article"
+  date={note.data.updated}
+  updated={note.data.updated}
+  tags={[note.data.category]}
+>
+  <ReadingProgress />
   <TableOfContents headings={headings} />
+
   <article class="prose" data-pagefind-body>
-    <div class="meta">
-      <span class="tag">{note.data.category}</span>
-      {note.data.updated && <span>更新于 {fmt(note.data.updated)}</span>}
-    </div>
-    <h1>{note.data.title}</h1>
+    <header class="note-header">
+      <a class="eyebrow mono" href={withBase('/notes')}># {note.data.category}</a>
+      <h1>{note.data.title}</h1>
+      <div class="note-meta">
+        <span>{minutes} 分钟阅读</span>
+        {note.data.updated && (
+          <>
+            <span class="sep" aria-hidden="true">·</span>
+            <span>更新于 <time class="mono" datetime={isoDateTime(note.data.updated)}>{formatDate(note.data.updated)}</time></span>
+          </>
+        )}
+      </div>
+    </header>
     <Content />
   </article>
+
+  <ProseEnhancer />
+  <PrevNext prev={toItem(prev)} next={toItem(next)} />
   <Comments />
-  <p class="back"><a href={withBase('/notes')}>← 返回知识库</a></p>
+  <a class="back" href={withBase('/notes')}><span class="arrow">←</span> 返回知识库</a>
 </BaseLayout>
 
 <style>
-  .meta { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-  .back { margin-top: 48px; }
+  .note-header {
+    margin-bottom: var(--space-6);
+  }
+  .eyebrow {
+    display: inline-block;
+    color: var(--accent);
+    font-size: var(--step--1);
+    margin-bottom: 0.4rem;
+  }
+  .note-header h1 {
+    margin: 0;
+    font-size: var(--step-3);
+    line-height: 1.2;
+  }
+  .note-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.7rem;
+    margin-top: 0.9rem;
+    color: var(--text-faint);
+    font-size: var(--step--1);
+  }
+  .note-meta .sep {
+    color: var(--border-strong);
+  }
 </style>

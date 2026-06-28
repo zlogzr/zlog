@@ -11,8 +11,12 @@ export default defineConfig({
   integrations: [sitemap(), pagefind()],
   markdown: {
     shikiConfig: {
-      // 代码高亮主题，浅色用 github-light，深色用 github-dark
+      // 双主题：浅色 github-light，深色 github-dark。
+      // defaultColor: false → 每个 token 同时输出 --shiki-light / --shiki-dark
+      // 两套 CSS 变量，由 global.css 里基于 [data-theme] 的规则切换，
+      // 从而让代码块跟随站点的「手动」主题开关，而非系统配色。
       themes: { light: 'github-light', dark: 'github-dark' },
+      defaultColor: false,
       wrap: true,
     },
   },

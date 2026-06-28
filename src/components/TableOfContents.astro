@@ -28,23 +28,28 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
   .toc {
     display: none; /* 默认隐藏，宽屏才显示 */
   }
-  /* 视口够宽时，把目录固定在正文右侧空白处 */
-  @media (min-width: 1200px) {
+  /* 视口够宽时，把目录固定在正文右侧空白处。位置从 --content-width 推导。 */
+  @media (min-width: 1240px) {
     .toc {
       display: block;
       position: fixed;
-      top: 96px;
-      left: calc(50% + 384px);
-      width: 200px;
+      top: calc(var(--header-height) + 2.5rem);
+      left: calc(50% + var(--content-width) / 2 + 2.5rem);
+      width: 210px;
       max-height: 72vh;
       overflow-y: auto;
-      font-size: 0.85rem;
+      overscroll-behavior: contain;
+      font-size: var(--step--1);
       line-height: 1.5;
     }
     .toc-title {
-      margin: 0 0 8px;
+      margin: 0 0 10px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 600;
-      color: var(--text);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
     }
     .toc ul {
       list-style: none;
@@ -81,12 +86,22 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 </style>
 
 <script>
-  const links = document.querySelectorAll<HTMLAnchorElement>('.toc a[data-toc]');
-  if (links.length) {
+  // Scroll-spy for the active heading. Driven by astro:page-load so it
+  // re-initialises after every View Transition (module scripts only run once,
+  // so inline setup would otherwise stop working after client-side nav).
+  let tocObserver: IntersectionObserver | undefined;
+
+  function initTOC() {
+    tocObserver?.disconnect();
+    const links = document.querySelectorAll<HTMLAnchorElement>('.toc a[data-toc]');
+    if (!links.length) return;
+
     const map = new Map<string, HTMLAnchorElement>();
     links.forEach((l) => map.set(l.dataset.toc!, l));
 
     const headings = document.querySelectorAll('article :is(h2, h3)[id]');
+    if (!headings.length) return;
+
     let activeId = '';
     const setActive = (id: string) => {
       if (id === activeId) return;
@@ -95,7 +110,7 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
       map.get(id)?.classList.add('active');
     };
 
-    const observer = new IntersectionObserver(
+    tocObserver = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting) setActive((e.target as HTMLElement).id);
@@ -103,6 +118,8 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
       },
       { rootMargin: '-80px 0px -70% 0px', threshold: 0 },
     );
-    headings.forEach((h) => observer.observe(h));
+    headings.forEach((h) => tocObserver!.observe(h));
   }
+
+  document.addEventListener('astro:page-load', initTOC);
 </script>

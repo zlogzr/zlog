@@ -1,0 +1,84 @@
+---
+// Progressively enhances rendered article HTML: copy buttons + language labels
+// on code blocks, and hover-to-copy anchor links on headings. Emits no markup
+// of its own, so without JS the article is still a clean, readable document.
+---
+<script>
+  const COPY_SVG =
+    '<svg class="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const CHECK_SVG =
+    '<svg class="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+
+  // Languages we don't bother labelling.
+  const GENERIC = new Set(['text', 'plaintext', 'plain', 'txt', 'ansi', '']);
+
+  function enhanceProse() {
+    const root = document.querySelector('article.prose');
+    if (!root) return;
+
+    root.querySelectorAll<HTMLPreElement>('pre.astro-code').forEach((pre) => {
+      if (pre.closest('.code-block')) return; // already done (e.g. re-entry)
+
+      const wrap = document.createElement('div');
+      wrap.className = 'code-block';
+      pre.replaceWith(wrap);
+      wrap.appendChild(pre);
+
+      const lang = (pre.dataset.language || '').toLowerCase();
+      const bar = document.createElement('div');
+      bar.className = 'code-bar';
+      if (!GENERIC.has(lang)) {
+        const label = document.createElement('span');
+        label.className = 'code-lang';
+        label.textContent = lang;
+        bar.appendChild(label);
+      }
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'code-copy';
+      btn.setAttribute('aria-label', '复制代码');
+      btn.innerHTML = COPY_SVG + CHECK_SVG;
+      bar.appendChild(btn);
+      wrap.appendChild(bar);
+
+      let reset: ReturnType<typeof setTimeout>;
+      btn.addEventListener('click', async () => {
+        const code = pre.querySelector('code')?.innerText ?? pre.innerText;
+        try {
+          await navigator.clipboard.writeText(code);
+        } catch {
+          const ta = document.createElement('textarea');
+          ta.value = code;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand('copy');
+          } catch {}
+          ta.remove();
+        }
+        btn.classList.add('copied');
+        btn.setAttribute('aria-label', '已复制');
+        clearTimeout(reset);
+        reset = setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.setAttribute('aria-label', '复制代码');
+        }, 1700);
+      });
+    });
+
+    root.querySelectorAll<HTMLElement>('h2[id], h3[id], h4[id]').forEach((h) => {
+      if (h.querySelector('.anchor-link')) return;
+      const a = document.createElement('a');
+      a.className = 'anchor-link';
+      a.href = '#' + h.id;
+      a.textContent = '#';
+      a.setAttribute('aria-label', `链接到：${h.textContent}`);
+      h.prepend(a);
+    });
+  }
+
+  document.addEventListener('astro:page-load', enhanceProse);
+</script>

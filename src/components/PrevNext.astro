@@ -1,0 +1,81 @@
+---
+interface Item {
+  href: string;
+  title: string;
+}
+interface Props {
+  prev?: Item | null;
+  next?: Item | null;
+}
+const { prev, next } = Astro.props;
+---
+{(prev || next) && (
+  <nav class="prevnext" aria-label="上一篇 / 下一篇">
+    {prev ? (
+      <a class="pn pn-prev" href={prev.href}>
+        <span class="pn-label">← 上一篇</span>
+        <span class="pn-title">{prev.title}</span>
+      </a>
+    ) : (
+      <span />
+    )}
+    {next ? (
+      <a class="pn pn-next" href={next.href}>
+        <span class="pn-label">下一篇 →</span>
+        <span class="pn-title">{next.title}</span>
+      </a>
+    ) : (
+      <span />
+    )}
+  </nav>
+)}
+
+<style>
+  .prevnext {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+  }
+  .pn {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+  .pn:hover {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .pn-next {
+    text-align: right;
+  }
+  .pn-label {
+    font-size: var(--step--1);
+    color: var(--text-faint);
+  }
+  .pn-title {
+    font-weight: 550;
+    line-height: 1.45;
+  }
+  .pn:hover .pn-title {
+    color: var(--accent);
+  }
+  @media (max-width: 560px) {
+    .prevnext {
+      grid-template-columns: 1fr;
+    }
+    .pn-next {
+      text-align: left;
+    }
+  }
+</style>

@@ -2,30 +2,127 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { withBase, tagUrl } from '../../lib/url';
+import { formatDate, isoDateTime, readingTime } from '../../lib/format';
 
-const posts = (await getCollection('posts', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const fmt = (d: Date) => d.toISOString().slice(0, 10);
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+// Group by year for a timeline feel.
+const byYear = new Map<number, typeof posts>();
+for (const p of posts) {
+  const y = p.data.date.getFullYear();
+  if (!byYear.has(y)) byYear.set(y, []);
+  byYear.get(y)!.push(p);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
 ---
-<BaseLayout title="博客" description="文章与思考">
-  <div class="head">
-    <h1>博客</h1>
-    <a href={withBase('/tags')} class="by-tag">🏷 按标签浏览</a>
+<BaseLayout title="博客" description="文章与思考——关于工程、AI，和把事情想清楚。">
+  <div class="page-head">
+    <p class="eyebrow mono">// blog</p>
+    <div class="head-row">
+      <h1>博客</h1>
+      <a href={withBase('/tags')} class="by-tag">按标签浏览 →</a>
+    </div>
+    <p class="lede">带时间线的文章与思考。共 {posts.length} 篇。</p>
   </div>
-  {posts.map((p) => (
-    <article class="entry">
-      <h3><a href={withBase(`/posts/${p.id}`)}>{p.data.title}</a></h3>
-      <div class="meta">
-        {fmt(p.data.date)}
-        {p.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
-      </div>
-      {p.data.description && <p>{p.data.description}</p>}
-    </article>
+
+  {posts.length === 0 && <p class="empty">还没有文章。</p>}
+
+  {years.map((year) => (
+    <section class="year-group">
+      <h2 class="year mono">{year}</h2>
+      <ul class="entries">
+        {byYear.get(year)!.map((p) => (
+          <li class="entry" data-reveal>
+            <div class="entry-meta mono">
+              <time datetime={isoDateTime(p.data.date)}>{formatDate(p.data.date)}</time>
+              <span class="sep">·</span>
+              <span>{readingTime(p.body ?? '')} 分钟</span>
+            </div>
+            <h3><a href={withBase(`/posts/${p.id}`)}>{p.data.title}</a></h3>
+            {p.data.description && <p class="excerpt">{p.data.description}</p>}
+            {p.data.tags.length > 0 && (
+              <div class="entry-tags">
+                {p.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
   ))}
 </BaseLayout>
 
 <style>
-  .head { display: flex; align-items: baseline; justify-content: space-between; }
-  .head h1 { margin: 0; }
-  .by-tag { font-size: 0.9rem; color: var(--text-soft); }
+  .head-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .head-row h1 {
+    margin: 0;
+  }
+  .by-tag {
+    flex-shrink: 0;
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+  .by-tag:hover {
+    color: var(--accent);
+  }
+  .empty {
+    color: var(--text-soft);
+  }
+
+  .year-group {
+    margin-top: var(--space-6);
+  }
+  .year {
+    font-size: var(--step-1);
+    color: var(--text-faint);
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+  }
+  .entries {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .entry {
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--border);
+  }
+  .entry-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-faint);
+    font-size: var(--step--1);
+  }
+  .entry-meta .sep {
+    color: var(--border-strong);
+  }
+  .entry h3 {
+    margin: 0.4rem 0 0;
+    font-size: var(--step-1);
+    letter-spacing: -0.01em;
+  }
+  .entry h3 a {
+    color: var(--text);
+  }
+  .entry h3 a:hover {
+    color: var(--accent);
+  }
+  .excerpt {
+    margin: 0.45rem 0 0;
+    color: var(--text-soft);
+  }
+  .entry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+  }
 </style>

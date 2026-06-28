@@ -6,39 +6,116 @@ import { withBase } from '../../lib/url';
 
 const notes = await getCollection('notes', ({ data }) => !data.draft);
 
-// 按分类分组
+// Group by category, sort items within each by `order` then title.
 const byCategory = new Map<string, typeof notes>();
 for (const n of notes) {
   const c = n.data.category;
   if (!byCategory.has(c)) byCategory.set(c, []);
   byCategory.get(c)!.push(n);
 }
-const categories = [...byCategory.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+const categories = [...byCategory.entries()].sort((a, b) => a[0].localeCompare(b[0], 'zh'));
 for (const [, items] of categories) {
-  items.sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
+  items.sort(
+    (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title, 'zh'),
+  );
 }
 ---
-<BaseLayout title="知识库" description="按主题整理的知识点">
-  <h1>知识库</h1>
-  <p style="color:var(--text-soft)">按主题沉淀的知识点，会持续更新。</p>
+<BaseLayout title="知识库" description="按主题整理、会反复修订的知识点。">
+  <div class="page-head">
+    <p class="eyebrow mono">// knowledge base</p>
+    <h1>知识库</h1>
+    <p class="lede">按主题沉淀、会反复修订的知识点。共 {notes.length} 条 · {categories.length} 个分类。</p>
+  </div>
+
   <div class="search">
     <Search />
   </div>
-  {categories.length === 0 && <p style="color:var(--text-soft)">还没有笔记，去 src/content/notes/ 添加吧。</p>}
-  {categories.map(([cat, items]) => (
-    <section class="cat">
-      <h2>{cat}</h2>
-      {items.map((n) => (
-        <article class="entry">
-          <h3><a href={withBase(`/notes/${n.id}`)}>{n.data.title}</a></h3>
-          {n.data.description && <p>{n.data.description}</p>}
-        </article>
-      ))}
-    </section>
-  ))}
+
+  {categories.length === 0 && <p class="empty">还没有笔记。</p>}
+
+  <div class="cats">
+    {categories.map(([cat, items]) => (
+      <section class="cat" data-reveal>
+        <h2 class="cat-title">
+          <span class="mono hash">#</span> {cat}
+          <span class="cat-count">{items.length}</span>
+        </h2>
+        <ul class="note-list">
+          {items.map((n) => (
+            <li>
+              <a class="note" href={withBase(`/notes/${n.id}`)}>
+                <span class="note-title">{n.data.title}</span>
+                {n.data.description && <span class="note-desc">{n.data.description}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
 </BaseLayout>
 
 <style>
-  .cat { margin-top: 32px; }
-  .search { margin: 20px 0 8px; }
+  .search {
+    margin: 0 0 var(--space-6);
+  }
+  .empty {
+    color: var(--text-soft);
+  }
+  .cats {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .cat-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--step-1);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    margin: 0 0 0.5rem;
+  }
+  .hash {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .cat-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0 0.5rem;
+    line-height: 1.6;
+  }
+  .note-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.7rem 0.85rem;
+    margin: 0 -0.85rem;
+    border-radius: var(--radius);
+    color: var(--text);
+    transition: background var(--dur-fast) var(--ease);
+  }
+  .note:hover {
+    background: var(--bg-subtle);
+  }
+  .note-title {
+    font-weight: 550;
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .note:hover .note-title {
+    color: var(--accent);
+  }
+  .note-desc {
+    color: var(--text-soft);
+    font-size: var(--step--1);
+  }
 </style>

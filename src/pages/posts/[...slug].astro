@@ -3,32 +3,91 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import ReadingProgress from '../../components/ReadingProgress.astro';
+import ProseEnhancer from '../../components/ProseEnhancer.astro';
+import PrevNext from '../../components/PrevNext.astro';
 import { withBase, tagUrl } from '../../lib/url';
+import { formatDate, isoDateTime, readingTime } from '../../lib/format';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  );
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      newer: i > 0 ? posts[i - 1] : null,
+      older: i < posts.length - 1 ? posts[i + 1] : null,
+    },
+  }));
 }
 
-const { post } = Astro.props;
+const { post, newer, older } = Astro.props;
 const { Content, headings } = await render(post);
-const fmt = (d: Date) => d.toISOString().slice(0, 10);
+const minutes = readingTime(post.body ?? '');
+
+const toItem = (p: typeof post | null) =>
+  p ? { href: withBase(`/posts/${p.id}`), title: p.data.title } : null;
 ---
-<BaseLayout title={post.data.title} description={post.data.description}>
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  type="article"
+  date={post.data.date}
+  tags={post.data.tags}
+>
+  <ReadingProgress />
   <TableOfContents headings={headings} />
+
   <article class="prose" data-pagefind-body>
-    <h1>{post.data.title}</h1>
-    <div class="meta">
-      {fmt(post.data.date)}
-      {post.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
-    </div>
+    <header class="post-header">
+      <h1>{post.data.title}</h1>
+      <div class="post-meta">
+        <time class="mono" datetime={isoDateTime(post.data.date)}>{formatDate(post.data.date)}</time>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>{minutes} 分钟阅读</span>
+        {post.data.tags.length > 0 && (
+          <span class="post-tags">
+            {post.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
+          </span>
+        )}
+      </div>
+    </header>
     <Content />
   </article>
+
+  <ProseEnhancer />
+  <PrevNext prev={toItem(older)} next={toItem(newer)} />
   <Comments />
-  <p class="back"><a href={withBase('/posts')}>← 返回博客</a></p>
+  <a class="back" href={withBase('/posts')}><span class="arrow">←</span> 返回博客</a>
 </BaseLayout>
 
 <style>
-  .meta { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 32px; }
-  .back { margin-top: 48px; }
+  .post-header {
+    margin-bottom: var(--space-6);
+  }
+  .post-header h1 {
+    margin: 0;
+    font-size: var(--step-3);
+    line-height: 1.2;
+  }
+  .post-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.7rem;
+    margin-top: 0.9rem;
+    color: var(--text-faint);
+    font-size: var(--step--1);
+  }
+  .post-meta .sep {
+    color: var(--border-strong);
+  }
+  .post-tags {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-left: 0.2rem;
+  }
 </style>

@@ -1,6 +1,7 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/url';
+import { SITE } from '../lib/site';
 
 export async function GET(context) {
   const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
@@ -11,8 +12,8 @@ export async function GET(context) {
   const site = new URL(import.meta.env.BASE_URL, context.site).href;
 
   return rss({
-    title: 'zlog 的技术笔记',
-    description: '记录重要知识点与个人思考',
+    title: SITE.name,
+    description: SITE.description,
     site,
     items: posts.map((p) => ({
       title: p.data.title,

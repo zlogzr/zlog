@@ -27,6 +27,10 @@ const bundlePath = withBase('/pagefind/');
 <script is:inline define:vars={{ jsSrc, bundlePath }}>
   (function () {
     function init() {
+      const el = document.querySelector('#search');
+      // Fresh, un-initialised search box only (avoids double UI under View Transitions).
+      if (!el || el.dataset.pfInit) return;
+      el.dataset.pfInit = '1';
       new window.PagefindUI({
         element: '#search',
         bundlePath: bundlePath,
@@ -45,13 +49,22 @@ const bundlePath = withBase('/pagefind/');
         },
       });
     }
-    if (window.PagefindUI) {
-      init();
-    } else {
-      const s = document.createElement('script');
-      s.src = jsSrc;
-      s.onload = init;
-      document.head.appendChild(s);
+    function boot() {
+      if (!document.querySelector('#search')) return;
+      if (window.PagefindUI) {
+        init();
+      } else {
+        const s = document.createElement('script');
+        s.src = jsSrc;
+        s.onload = init;
+        document.head.appendChild(s);
+      }
     }
+    // Run now (current page) and on every subsequent View Transition.
+    if (!window.__searchBound) {
+      window.__searchBound = true;
+      document.addEventListener('astro:page-load', boot);
+    }
+    boot();
   })();
 </script>

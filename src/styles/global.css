@@ -1,99 +1,736 @@
+/* =============================================================================
+   zlog — design system
+   Token-driven foundation. Everything (color, type, space, motion) flows from
+   the custom properties below so the two themes and every component stay in
+   sync. Tuned for a bilingual (中文 / Latin) developer blog.
+   ========================================================================== */
+
+/* ----------------------------------------------------------------------------
+   1. Design tokens
+   ------------------------------------------------------------------------- */
 :root {
+  /* Neutral ramp — cool, slightly desaturated. Light theme. */
   --bg: #ffffff;
-  --bg-soft: #f6f7f9;
-  --text: #1a1a1a;
-  --text-soft: #5a6068;
-  --border: #e5e7eb;
-  --accent: #2563eb;
+  --bg-subtle: #f6f7f9;
+  --bg-muted: #eceef2;
+  --surface: #ffffff;
+  --text: #15181d;
+  --text-soft: #565d68;
+  --text-faint: #6b7280; /* AA on white for small meta text (~4.5:1) */
+  --border: #e7e9ee;
+  --border-strong: #d6dae1;
+
+  /* Accent — a confident indigo-blue, used sparingly. */
+  --accent: #3b5bdb;
+  --accent-hover: #2f49b3;
+  --accent-soft: #eef1fd;        /* tinted surface behind accent elements */
+  --accent-contrast: #ffffff;    /* text on a solid accent fill */
+
+  /* Syntax/code surface */
   --code-bg: #f6f8fa;
-  --max-width: 720px;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --font-mono: "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+  --code-border: #e7e9ee;
+  --kbd-bg: #fafbfc;
+
+  /* Typography */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC",
+    sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Cascadia Code",
+    ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-cjk-feature: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei";
+
+  /* Fluid type scale (1.250 major-third-ish, clamped for small screens) */
+  --step--1: clamp(0.82rem, 0.80rem + 0.10vw, 0.875rem);
+  --step-0: clamp(0.97rem, 0.95rem + 0.12vw, 1.02rem);
+  --step-1: clamp(1.15rem, 1.10rem + 0.30vw, 1.30rem);
+  --step-2: clamp(1.40rem, 1.30rem + 0.55vw, 1.70rem);
+  --step-3: clamp(1.70rem, 1.50rem + 1.00vw, 2.20rem);
+  --step-4: clamp(2.05rem, 1.70rem + 1.70vw, 3.00rem);
+
+  /* Spacing scale (8px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* Elevation — soft, low-contrast shadows for the light theme. */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.06), 0 2px 6px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.10), 0 4px 12px rgba(16, 24, 40, 0.06);
+  --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
+
+  /* Layout */
+  --content-width: 720px;
+  --header-height: 60px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.15s;
+  --dur: 0.24s;
+  --dur-slow: 0.4s;
+
+  color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --bg: #0d1117;
-  --bg-soft: #161b22;
-  --text: #e6edf3;
-  --text-soft: #8b949e;
-  --border: #21262d;
-  --accent: #58a6ff;
-  --code-bg: #161b22;
+  /* Deep slate — not pure black, holds a hint of blue. */
+  --bg: #0b0e13;
+  --bg-subtle: #12161d;
+  --bg-muted: #1a1f29;
+  --surface: #11151c;
+  --text: #e8ecf2;
+  --text-soft: #9aa3b2;
+  --text-faint: #7c8694; /* AA on dark bg for small meta text (~4.8:1) */
+  --border: #232a35;
+  --border-strong: #323b48;
+
+  --accent: #7f9cff;
+  --accent-hover: #9bb0ff;
+  --accent-soft: #181f33;
+  --accent-contrast: #0b0e13;
+
+  --code-bg: #11161e;
+  --code-border: #222a35;
+  --kbd-bg: #1a212c;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55), 0 4px 14px rgba(0, 0, 0, 0.40);
+
+  color-scheme: dark;
 }
 
-* { box-sizing: border-box; }
+/* ----------------------------------------------------------------------------
+   2. Reset & base
+   ------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-html { scroll-behavior: smooth; }
+* {
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 1.5rem);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
 
 body {
-  margin: 0;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: var(--step-0);
   line-height: 1.75;
+  overflow-x: clip; /* defensive: never let a stray wide child scroll the page */
+  font-feature-settings: "kern", "liga", "calt", "tnum" 0;
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.2s, color 0.2s;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* ----------------------------------------------------------------------------
+   3. Typography
+   ------------------------------------------------------------------------- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.014em;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+h1 {
+  font-size: var(--step-4);
+  letter-spacing: -0.022em;
+}
+h2 {
+  font-size: var(--step-2);
+}
+h3 {
+  font-size: var(--step-1);
+}
+
+strong {
+  font-weight: 650;
+  color: var(--text);
+}
+
+/* ----------------------------------------------------------------------------
+   4. Links
+   ------------------------------------------------------------------------- */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease);
+}
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* ----------------------------------------------------------------------------
+   5. Accessibility — focus, selection, skip link
+   ------------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  color: var(--text);
+}
+
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -120%);
+  z-index: 100;
+  padding: 0.6em 1.2em;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-radius: 0 0 var(--radius) var(--radius);
+  font-size: var(--step--1);
+  font-weight: 600;
+  transition: transform var(--dur) var(--ease);
+}
+.skip-link:focus {
+  transform: translate(-50%, 0);
+  color: var(--accent-contrast);
+}
+
+/* ----------------------------------------------------------------------------
+   6. Layout
+   ------------------------------------------------------------------------- */
 .wrap {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: clamp(1.1rem, 5vw, 1.5rem);
 }
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+main {
+  flex: 1 0 auto;
+  padding-block: clamp(2rem, 5vw, 3.25rem) var(--space-9);
+}
 
-h1, h2, h3, h4 { line-height: 1.3; font-weight: 700; }
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin-block: var(--space-7);
+}
 
-main { padding: 40px 0 80px; }
+/* ----------------------------------------------------------------------------
+   7. Prose — long-form article typography
+   ------------------------------------------------------------------------- */
+.prose {
+  font-size: var(--step-0);
+}
+.prose > * + * {
+  margin-top: 1.15em;
+}
+.prose h2,
+.prose h3,
+.prose h4 {
+  margin-top: 2.2em;
+  margin-bottom: 0.7em;
+  scroll-margin-top: calc(var(--header-height) + 1.5rem);
+}
+.prose h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+.prose h2 + *,
+.prose h3 + *,
+.prose h4 + * {
+  margin-top: 0.6em;
+}
 
-/* 文章正文排版 */
-.prose h2 { margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
-.prose h3 { margin-top: 1.6em; }
-.prose img { max-width: 100%; border-radius: 8px; }
+/* Anchor affordance on headings */
+.prose :is(h2, h3, h4) {
+  position: relative;
+}
+.prose :is(h2, h3, h4) .anchor-link {
+  position: absolute;
+  left: -1.1em;
+  padding-right: 0.4em;
+  color: var(--text-faint);
+  opacity: 0;
+  font-weight: 400;
+  text-decoration: none;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.prose :is(h2, h3, h4):hover .anchor-link,
+.prose .anchor-link:focus-visible {
+  opacity: 1;
+}
+@media (max-width: 640px) {
+  .prose :is(h2, h3, h4) .anchor-link {
+    display: none;
+  }
+}
+
+.prose a {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.prose a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.prose :is(ul, ol) {
+  padding-left: 1.4em;
+}
+.prose li + li {
+  margin-top: 0.4em;
+}
+.prose li::marker {
+  color: var(--text-faint);
+}
+
+.prose img {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
 .prose blockquote {
-  margin: 1em 0; padding: 0.4em 1em;
+  margin-block: 1.5em;
+  padding: 0.2em 0 0.2em 1.2em;
   border-left: 3px solid var(--accent);
-  color: var(--text-soft); background: var(--bg-soft);
-}
-.prose code {
-  font-family: var(--font-mono);
-  font-size: 0.88em;
-  background: var(--code-bg);
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-}
-.prose pre {
-  padding: 16px;
-  border-radius: 8px;
-  overflow-x: auto;
-  border: 1px solid var(--border);
-}
-.prose pre code { background: none; padding: 0; }
-.prose table { border-collapse: collapse; width: 100%; }
-.prose th, .prose td { border: 1px solid var(--border); padding: 6px 12px; }
-
-/* 列表卡片 */
-.entry { padding: 18px 0; border-bottom: 1px solid var(--border); }
-.entry h3 { margin: 0 0 4px; font-size: 1.1rem; }
-.entry .meta { color: var(--text-soft); font-size: 0.85rem; }
-.entry p { margin: 6px 0 0; color: var(--text-soft); font-size: 0.95rem; }
-
-.tag {
-  display: inline-block;
-  font-size: 0.75rem;
   color: var(--text-soft);
-  background: var(--bg-soft);
+  font-style: normal;
+}
+.prose blockquote p {
+  margin: 0;
+}
+
+/* Inline code */
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  padding: 0.12em 0.4em;
+  border-radius: var(--radius-sm);
+  word-break: break-word;
+}
+
+/* Code blocks — Shiki output lands in <pre.astro-code>.
+   With shikiConfig.defaultColor:false, tokens carry both --shiki-light and
+   --shiki-dark; we pick the set based on the site's manual theme. */
+.prose pre.astro-code {
+  position: relative;
+  font-size: 0.85em;
+  line-height: 1.6;
+  padding: 1.05rem 1.15rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  border: 1px solid var(--code-border);
+  background: var(--code-bg);
+  box-shadow: var(--shadow-sm);
+  -webkit-overflow-scrolling: touch;
+}
+.prose pre.astro-code,
+.prose pre.astro-code span {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+:root[data-theme='dark'] .prose pre.astro-code,
+:root[data-theme='dark'] .prose pre.astro-code span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+.prose pre code {
+  font-family: var(--font-mono);
+  background: none;
+  border: none;
+  padding: 0;
+  display: block;
+  width: fit-content;
+  min-width: 100%;
+  counter-reset: none;
+}
+
+/* Enhanced code block: wrapper adds a header bar (language + copy). Built
+   client-side by ProseEnhancer so no-JS still gets a clean <pre>. */
+.code-block {
+  position: relative;
+  margin-block: 1.5em;
+}
+.code-block pre.astro-code {
+  margin: 0;
+}
+.code-block .code-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  pointer-events: none;
+}
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  user-select: none;
+}
+.code-copy {
+  pointer-events: auto;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
   border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 1px 10px;
-  margin-right: 6px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--code-bg) 80%, var(--bg));
+  color: var(--text-soft);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease), color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+.code-block:hover .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+.code-copy:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.code-copy svg {
+  width: 15px;
+  height: 15px;
+}
+.code-copy .i-check {
+  display: none;
+  color: #16a34a;
+}
+.code-copy.copied .i-copy {
+  display: none;
+}
+.code-copy.copied .i-check {
+  display: block;
+}
+@media (hover: none) {
+  .code-copy {
+    opacity: 1;
+  }
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+  display: block;
+  overflow-x: auto;
+}
+.prose :is(th, td) {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.85em;
+  text-align: left;
+}
+.prose th {
+  background: var(--bg-subtle);
+  font-weight: 650;
+}
+.prose tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--bg-subtle) 55%, transparent);
+}
+
+.prose kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  background: var(--kbd-bg);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.45em;
+}
+
+.prose mark {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: inherit;
+  padding: 0.05em 0.2em;
+  border-radius: 3px;
+}
+
+/* ----------------------------------------------------------------------------
+   8. Components
+   ------------------------------------------------------------------------- */
+
+/* Page heading block (list/index pages) */
+.page-head {
+  margin-bottom: var(--space-6);
+}
+.page-head .eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-transform: lowercase;
+}
+.page-head h1 {
+  margin-top: 0.35em;
+}
+.page-head .lede {
+  margin-top: 0.6em;
+  color: var(--text-soft);
+  max-width: 40em;
+}
+
+/* Article/list entry */
+.entry {
+  position: relative;
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+.entry h3 {
+  margin: 0 0 0.3rem;
+  font-size: var(--step-1);
+  letter-spacing: -0.01em;
+}
+.entry h3 a {
+  color: var(--text);
+}
+.entry h3 a:hover {
+  color: var(--accent);
+}
+.entry .meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  color: var(--text-faint);
+  font-size: var(--step--1);
+}
+.entry p {
+  margin: 0.5rem 0 0;
+  color: var(--text-soft);
+  font-size: var(--step-0);
+}
+
+/* Monospace metadata token (dates etc.) */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Tags / pills */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--text-soft);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 0.05em 0.7em;
+  transition: color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
 }
 a.tag:hover {
   border-color: var(--accent);
   color: var(--accent);
-  text-decoration: none;
+  background: var(--accent-soft);
+}
+
+/* Generic button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-size: var(--step--1);
+  font-weight: 550;
+  padding: 0.5em 1em;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+.btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--accent-contrast);
+}
+
+/* "Back" link shared across detail pages */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: var(--space-8);
+  color: var(--text-soft);
+  font-size: var(--step--1);
+}
+.back:hover {
+  color: var(--accent);
+}
+.back .arrow {
+  transition: transform var(--dur) var(--ease);
+}
+.back:hover .arrow {
+  transform: translateX(-3px);
+}
+
+/* ----------------------------------------------------------------------------
+   9. Motion utilities
+   ------------------------------------------------------------------------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Entrance animation. Pure CSS, plays on load (and again after each View
+   Transition, since the element is freshly inserted). Gated behind `.js`
+   (set synchronously in <head>) so no-JS visitors get fully visible content,
+   and `both` fill means the element can never get stuck hidden — the
+   animation always resolves to opacity 1. Deliberately observer-free:
+   robustness over a scroll-triggered flourish. */
+html.js [data-reveal] {
+  animation: rise var(--dur-slow) var(--ease-out) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  html.js [data-reveal] {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   10. Scrollbar & print
+   ------------------------------------------------------------------------- */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border: 3px solid var(--bg);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-faint);
+  }
+}
+
+@media print {
+  .skip-link,
+  header,
+  footer,
+  .toc,
+  .comments,
+  #reading-progress {
+    display: none !important;
+  }
+  body {
+    color: #000;
+    background: #fff;
+  }
+  .prose a {
+    text-decoration: underline;
+  }
 }
