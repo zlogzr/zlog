@@ -357,6 +357,65 @@ hr {
   cursor: help;
 }
 
+/* Callout boxes (:::tip / :::note / :::info / :::warning / :::danger) */
+.prose .callout {
+  --cl: var(--accent);
+  margin-block: 1.5em;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--cl) 28%, var(--border));
+  border-left: 3px solid var(--cl);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--cl) 9%, var(--bg));
+}
+.prose .callout > :first-child {
+  margin-top: 0;
+}
+.prose .callout > :last-child {
+  margin-bottom: 0;
+}
+.prose .callout-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 650;
+  color: var(--cl);
+  margin-bottom: 0.4em;
+}
+.prose .callout-title::before {
+  content: '●';
+  font-size: 0.9em;
+}
+.prose .callout-tip {
+  --cl: #2f9e44;
+}
+.prose .callout-tip .callout-title::before {
+  content: '💡';
+}
+.prose .callout-note {
+  --cl: #5c7cfa;
+}
+.prose .callout-note .callout-title::before {
+  content: '📝';
+}
+.prose .callout-info {
+  --cl: #1c7ed6;
+}
+.prose .callout-info .callout-title::before {
+  content: 'ℹ️';
+}
+.prose .callout-warning {
+  --cl: #e8590c;
+}
+.prose .callout-warning .callout-title::before {
+  content: '⚠️';
+}
+.prose .callout-danger {
+  --cl: #e03131;
+}
+.prose .callout-danger .callout-title::before {
+  content: '🛑';
+}
+
 .prose :is(ul, ol) {
   padding-left: 1.4em;
 }

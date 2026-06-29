@@ -3,6 +3,7 @@ import '@fontsource-variable/inter/opsz.css';
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
+import SearchModal from '../components/SearchModal.astro';
 import { withBase } from '../lib/url';
 import { SITE, AUTHOR } from '../lib/site';
 
@@ -18,6 +19,8 @@ interface Props {
   /** Absolute or site-relative social card image. */
   image?: string;
   noindex?: boolean;
+  /** Breadcrumb trail (site-relative, base-included urls) → BreadcrumbList JSON-LD. */
+  breadcrumbs?: { name: string; url: string }[];
 }
 
 const {
@@ -29,6 +32,7 @@ const {
   tags = [],
   image = '/og.png',
   noindex = false,
+  breadcrumbs,
 } = Astro.props;
 
 const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name} · 工程实践与技术思考`;
@@ -112,6 +116,21 @@ const jsonLd =
     {socialImage && <meta name="twitter:image" content={socialImage} />}
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {breadcrumbs && breadcrumbs.length > 0 && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: breadcrumbs.map((b, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: b.name,
+            item: new URL(b.url, SITE.origin).href,
+          })),
+        })}
+      />
+    )}
 
     <!-- Set theme before paint to avoid a flash; survive view transitions. -->
     <script is:inline>
@@ -151,6 +170,7 @@ const jsonLd =
   <body>
     <a href="#main" class="skip-link">跳到主内容</a>
     <Header />
+    <SearchModal />
     <main id="main" class="wrap">
       <slot />
     </main>
@@ -158,6 +178,7 @@ const jsonLd =
       <div class="wrap foot">
         <p class="foot-brand"><span class="mono">~/zlog</span> · 工程实践与技术思考</p>
         <nav class="foot-links" aria-label="页脚">
+          <a href={withBase('/archive')}>归档</a>
           <a href={AUTHOR.github} target="_blank" rel="noopener noreferrer">GitHub</a>
           <a href={withBase('/rss.xml')}>RSS</a>
           <a href={`mailto:${AUTHOR.email}`}>邮箱</a>

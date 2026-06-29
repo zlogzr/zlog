@@ -9,6 +9,7 @@ import PrevNext from '../../components/PrevNext.astro';
 import SeriesNav from '../../components/SeriesNav.astro';
 import RelatedNotes from '../../components/RelatedNotes.astro';
 import Mermaid from '../../components/Mermaid.astro';
+import ShareButton from '../../components/ShareButton.astro';
 import { withBase } from '../../lib/url';
 import { formatDate, isoDateTime, readingTime } from '../../lib/format';
 import { getAllEntries, getConnections } from '../../lib/collections';
@@ -53,6 +54,11 @@ const toItem = (n: typeof note | null) =>
   updated={note.data.updated}
   tags={[note.data.category]}
   image={`/og/${note.id}.png`}
+  breadcrumbs={[
+    { name: '首页', url: withBase('/') },
+    { name: '知识库', url: withBase('/notes') },
+    { name: note.data.title, url: withBase(`/notes/${note.id}`) },
+  ]}
 >
   <ReadingProgress />
   <TableOfContents headings={headings} />
@@ -70,6 +76,7 @@ const toItem = (n: typeof note | null) =>
             <span>更新于 <time class="mono" datetime={isoDateTime(note.data.updated)}>{formatDate(note.data.updated)}</time></span>
           </>
         )}
+        <ShareButton />
       </div>
     </header>
     <Content />

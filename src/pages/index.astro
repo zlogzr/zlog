@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { withBase, tagUrl } from '../lib/url';
 import { AUTHOR } from '../lib/site';
 import { formatDate } from '../lib/format';
+import { getAllEntries, getSeries } from '../lib/collections';
 
 const allPosts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -15,6 +16,24 @@ const notes = await getCollection('notes', ({ data }) => !data.draft);
 const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =>
   a.localeCompare(b, 'zh'),
 );
+
+// Series + graph stats for the homepage.
+const entries = await getAllEntries();
+const series = getSeries(entries);
+const featuredSeries = series.slice(0, 3);
+const edgeKeys = new Set<string>();
+const ids = new Set(entries.map((e) => e.id));
+for (const e of entries) {
+  for (const rel of e.related) {
+    if (ids.has(rel)) edgeKeys.add([e.id, rel].sort().join('::'));
+  }
+}
+const stats = [
+  { n: allPosts.length, label: '篇文章' },
+  { n: notes.length, label: '条笔记' },
+  { n: series.length, label: '个系列' },
+  { n: edgeKeys.size, label: '条连接' },
+];
 ---
 
 <BaseLayout>
@@ -46,6 +65,15 @@ const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =
     <div class="glow" aria-hidden="true"></div>
   </section>
 
+  <section class="stats" data-reveal style="--reveal-delay: 60ms" aria-label="内容统计">
+    {stats.map((s) => (
+      <div class="stat">
+        <span class="stat-n mono">{s.n}</span>
+        <span class="stat-label">{s.label}</span>
+      </div>
+    ))}
+  </section>
+
   <section class="cards" data-reveal style="--reveal-delay: 80ms">
     <a class="card" href={withBase('/posts')}>
       <div class="card-icon">
@@ -71,7 +99,54 @@ const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =
       </div>
       <span class="card-foot">浏览全部 <span class="arrow">→</span></span>
     </a>
+
+    <a class="card" href={withBase('/series')}>
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>系列</h2>
+      <p class="card-desc">把分散的内容串成有序的学习路径。</p>
+      <p class="card-meta mono">{series.length} 条路径</p>
+      <span class="card-foot">浏览全部 <span class="arrow">→</span></span>
+    </a>
+
+    <a class="card" href={withBase('/graph')}>
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="5" cy="6" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="19" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="18" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 7l10 1.5M7.5 16l1-7M11 17l6-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      </div>
+      <h2>知识图谱</h2>
+      <p class="card-desc">把内容按引用关系画成一张可交互的图。</p>
+      <p class="card-meta mono">{edgeKeys.size} 条连接</p>
+      <span class="card-foot">去看看 <span class="arrow">→</span></span>
+    </a>
   </section>
+
+  {featuredSeries.length > 0 && (
+    <section class="featured" data-reveal style="--reveal-delay: 110ms">
+      <div class="section-head">
+        <h2>精选系列</h2>
+        <a href={withBase('/series')} class="more">全部系列 →</a>
+      </div>
+      <div class="series-grid">
+        {featuredSeries.map((s) => (
+          <a class="series-card" href={withBase(`/series/${encodeURIComponent(s.name)}`)}>
+            <div class="series-top">
+              <span class="series-name">{s.name}</span>
+              <span class="series-count mono">{s.items.length} 篇</span>
+            </div>
+            <ol class="series-mini">
+              {s.items.slice(0, 3).map((e, i) => (
+                <li>
+                  <span class="mono idx">{String(i + 1).padStart(2, '0')}</span>
+                  <span class="t">{e.title}</span>
+                </li>
+              ))}
+            </ol>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
 
   <section class="recent" data-reveal style="--reveal-delay: 140ms">
     <div class="section-head">
@@ -185,6 +260,39 @@ const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =
     pointer-events: none;
   }
 
+  /* ---- Stats ---- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-bottom: var(--space-7);
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.9rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .stat-n {
+    font-size: var(--step-2);
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .stat-label {
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+  @media (max-width: 480px) {
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   /* ---- Entry cards ---- */
   .cards {
     display: grid;
@@ -251,6 +359,81 @@ const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =
   }
   .card:hover .arrow {
     transform: translateX(4px);
+  }
+
+  /* ---- Featured series ---- */
+  .featured {
+    margin-bottom: var(--space-8);
+  }
+  .series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .series-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+  .series-card:hover {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-sm);
+  }
+  .series-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .series-name {
+    font-weight: 600;
+    font-size: var(--step-0);
+  }
+  .series-card:hover .series-name {
+    color: var(--accent);
+  }
+  .series-count {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0 0.5rem;
+    line-height: 1.7;
+  }
+  .series-mini {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.3rem;
+  }
+  .series-mini li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: var(--step--1);
+    color: var(--text-soft);
+  }
+  .series-mini .idx {
+    color: var(--text-faint);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+  .series-mini .t {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* ---- Recent list ---- */

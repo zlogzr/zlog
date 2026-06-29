@@ -2,8 +2,10 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import pagefind from 'astro-pagefind';
+import remarkDirective from 'remark-directive';
 import remarkMermaid from './src/lib/remark-mermaid.mjs';
 import remarkWikiLinks from './src/lib/remark-wikilinks.mjs';
+import remarkCallouts from './src/lib/remark-callouts.mjs';
 import { BASE } from './src/lib/base.mjs';
 import { validateContent } from './src/lib/validate-content.mjs';
 
@@ -33,9 +35,10 @@ export default defineConfig({
   // 注意：pagefind 需放在最后，它依赖其它集成已完成构建
   integrations: [contentValidator(), sitemap(), pagefind()],
   markdown: {
-    // 把 ```mermaid 转成原始 HTML，需在 Shiki 高亮前运行（remark 阶段先于 rehype）
-    // remarkWikiLinks 把正文里的 [[slug]] 解析为站内链接
-    remarkPlugins: [remarkMermaid, remarkWikiLinks],
+    // remarkDirective 解析 :::tip 容器语法，remarkCallouts 再把它变成提示框；
+    // remarkMermaid 把 ```mermaid 转原始 HTML（需先于 Shiki）；
+    // remarkWikiLinks 把正文 [[slug]] 解析为站内链接。
+    remarkPlugins: [remarkDirective, remarkCallouts, remarkMermaid, remarkWikiLinks],
     shikiConfig: {
       // 双主题：浅色 github-light，深色 github-dark。
       // defaultColor: false → 每个 token 同时输出 --shiki-light / --shiki-dark

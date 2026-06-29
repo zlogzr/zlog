@@ -1,0 +1,66 @@
+---
+// Copy-link / share button for articles. Uses the native share sheet on mobile
+// when available, otherwise copies the URL to the clipboard with feedback.
+---
+<button class="share-btn" type="button" data-share aria-label="复制本页链接">
+  <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+    <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span class="share-label">复制链接</span>
+</button>
+
+<style>
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.1rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--text-faint);
+    font-size: var(--step--1);
+    font-family: inherit;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  }
+  .share-btn:hover {
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  }
+  .share-btn.copied {
+    color: #2f9e44;
+    border-color: color-mix(in srgb, #2f9e44 45%, var(--border));
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-share]').forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', async () => {
+        const url = location.href;
+        const label = btn.querySelector('.share-label');
+        try {
+          if (navigator.share && matchMedia('(max-width: 640px)').matches) {
+            await navigator.share({ title: document.title, url });
+            return;
+          }
+          await navigator.clipboard.writeText(url);
+        } catch {
+          return;
+        }
+        if (!label) return;
+        const prev = label.textContent;
+        label.textContent = '已复制';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          label.textContent = prev;
+          btn.classList.remove('copied');
+        }, 1600);
+      });
+    });
+  });
+</script>

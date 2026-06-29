@@ -9,6 +9,7 @@ import PrevNext from '../../components/PrevNext.astro';
 import SeriesNav from '../../components/SeriesNav.astro';
 import RelatedNotes from '../../components/RelatedNotes.astro';
 import Mermaid from '../../components/Mermaid.astro';
+import ShareButton from '../../components/ShareButton.astro';
 import { withBase, tagUrl } from '../../lib/url';
 import { formatDate, isoDateTime, readingTime } from '../../lib/format';
 import { getAllEntries, getConnections } from '../../lib/collections';
@@ -45,6 +46,11 @@ const toItem = (p: typeof post | null) =>
   date={post.data.date}
   tags={post.data.tags}
   image={`/og/${post.id}.png`}
+  breadcrumbs={[
+    { name: '首页', url: withBase('/') },
+    { name: '博客', url: withBase('/posts') },
+    { name: post.data.title, url: withBase(`/posts/${post.id}`) },
+  ]}
 >
   <ReadingProgress />
   <TableOfContents headings={headings} />
@@ -62,6 +68,7 @@ const toItem = (p: typeof post | null) =>
             {post.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
           </span>
         )}
+        <ShareButton />
       </div>
     </header>
     <Content />

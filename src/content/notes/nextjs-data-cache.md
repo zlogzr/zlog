@@ -11,6 +11,10 @@ related: [nextjs-rendering-modes, nextjs-server-actions]
 
 App Router 最反直觉的一点：它**扩展了全局 `fetch`**。同样一行 `await fetch(url)`，行为和浏览器 / 旧 Node 里的不一样——它默认会缓存、会去重。这是「数据怎么也不更新」一类问题的头号原因。
 
+:::warning[最容易踩的坑]
+遇到「改了数据库，页面却不更新」，**先别怀疑代码逻辑，先查这次 `fetch` 的缓存配置**。十有八九是被 Data Cache 缓存住了。
+:::
+
 ## 两层缓存
 
 | 缓存 | 作用 | 范围 |

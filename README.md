@@ -66,6 +66,16 @@ related: [slug-a, slug-b]  # 可选，相关条目（反向链接自动反推）
 
 > **内容校验**：`related` / `series` / `[[wikilink]]` 关系图由[构建时校验](src/lib/validate-content.mjs)兜底——slug 写错、`seriesOrder` 撞号、wikilink 指向不存在的条目，**都会让构建失败**。本地随时可跑 `npm run validate`。
 
+### 提示框（Callout）
+
+正文里可用 `:::类型` 容器语法插入提示框，类型有 `tip` / `note` / `info` / `warning` / `danger`，可选自定义标题：
+
+```markdown
+:::warning[最容易踩的坑]
+遇到「改了数据库页面却不更新」，先查这次 fetch 的缓存配置。
+:::
+```
+
 ## 设计与架构
 
 站点本身也当作一份作品集来打磨，几处值得说明的地方：
