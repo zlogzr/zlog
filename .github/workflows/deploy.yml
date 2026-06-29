@@ -18,11 +18,19 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Mermaid 图在本地预渲染并随 public/beoe/ 一起提交，CI 命中文件即可、无需浏览器。
+      # 跳过 npm 安装 playwright 时自动下载 chromium（~150MB），加快 CI。
+      # 若改了图表却忘了本地重渲，CI 会因缺浏览器显式失败，而非静默发布旧图。
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build with Astro
         uses: withastro/action@v3
+        with:
+          # 与本地渲染环境保持同一 Node 大版本，构建可复现。
+          node-version: 22
 
   deploy:
     needs: build

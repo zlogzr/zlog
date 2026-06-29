@@ -28,6 +28,7 @@ npm run preview  # 本地预览构建产物
 ---
 title: 文章标题
 date: 2026-06-24
+updated: 2026-06-30   # 可选，填了文章页与结构化数据会显示「更新于」
 description: 一句话摘要（可选，会用于列表、SEO 和社交分享）
 tags: [标签1, 标签2]
 draft: false   # true 则不会发布
@@ -75,6 +76,23 @@ related: [slug-a, slug-b]  # 可选，相关条目（反向链接自动反推）
 :::
 ```
 
+### 图表（Mermaid）
+
+正文里用 ` ```mermaid ` 代码块画流程图 / 状态图等。图表在**构建期**渲染成浅 / 深两份
+静态 SVG（落到 `public/beoe/`，按图表源码哈希命名），页面**零 mermaid 运行时**、随主题
+切换显示对应版本。实现见 [src/lib/rehype-mermaid-build.mjs](src/lib/rehype-mermaid-build.mjs)。
+
+> **改图后要先本地构建、再提交。** 渲染依赖 Playwright + Chromium，而 CI 不带浏览器、
+> 只复用已提交的 SVG。首次准备一次环境：
+>
+> ```bash
+> npx playwright install chromium
+> ```
+>
+> 之后新增 / 修改图表，本地跑一次 `npm run build`（会自动渲染并更新 `public/beoe/`），
+> 把 `public/beoe/` 一起 `git add` 提交即可。若忘了重渲，CI 会因缺图**显式失败**，
+> 而非静默发布旧图。
+
 ## 设计与架构
 
 站点本身也当作一份作品集来打磨，几处值得说明的地方：
@@ -121,6 +139,8 @@ related: [slug-a, slug-b]  # 可选，相关条目（反向链接自动反推）
 
 ### 📡 RSS 订阅
 - 地址：**https://zlogzr.github.io/zlog/rss.xml** （页脚也有入口）。只收录博客文章，按时间倒序。
+- **全文输出**：用 Astro 容器 API 把每篇渲染成与页面一致的 HTML（保真 callout、双向链接、代码高亮），
+  写入 `<content:encoded>`，阅读器里能读全文而非摘要。
 - 源文件：[src/pages/rss.xml.js](src/pages/rss.xml.js)，新增文章后自动出现。
 
 ### 💬 评论（giscus）

@@ -8,7 +8,6 @@ import ProseEnhancer from '../../components/ProseEnhancer.astro';
 import PrevNext from '../../components/PrevNext.astro';
 import SeriesNav from '../../components/SeriesNav.astro';
 import RelatedNotes from '../../components/RelatedNotes.astro';
-import Mermaid from '../../components/Mermaid.astro';
 import ShareButton from '../../components/ShareButton.astro';
 import { withBase } from '../../lib/url';
 import { formatDate, isoDateTime, readingTime } from '../../lib/format';
@@ -87,7 +86,6 @@ const toItem = (n: typeof note | null) =>
   <PrevNext prev={toItem(prev)} next={toItem(next)} />
   <Comments />
   <a class="back" href={withBase('/notes')}><span class="arrow">←</span> 返回知识库</a>
-  <Mermaid />
 </BaseLayout>
 
 <style>

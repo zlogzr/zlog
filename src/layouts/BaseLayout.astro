@@ -1,5 +1,8 @@
 ---
 import '@fontsource-variable/inter/opsz.css';
+// Hashed URL of the Latin body subset, so we can preload exactly the file the
+// @font-face above will request (Vite dedupes by content → the preload hits).
+import interLatinUrl from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url';
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
@@ -80,13 +83,19 @@ const jsonLd =
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Preload the Latin body font (the LCP text) so it isn't discovered late
+         via the CSS @font-face chain. crossorigin is required even same-origin —
+         fonts fetch in CORS mode, and without it the browser double-downloads. -->
+    <link rel="preload" as="font" type="font/woff2" href={interLatinUrl} crossorigin />
+
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="author" content={AUTHOR.name} />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b0e13" media="(prefers-color-scheme: dark)" />
+    <!-- One theme-color meta; the inline theme script keeps it in sync with the
+         manual [data-theme] toggle rather than the system preference. -->
+    <meta name="theme-color" content="#ffffff" />
 
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
@@ -141,9 +150,12 @@ const jsonLd =
         const pref = () =>
           localStorage.getItem(KEY) ||
           (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const COLOR = { light: '#ffffff', dark: '#0b0e13' };
         const apply = (t) => {
           document.documentElement.setAttribute('data-theme', t);
           document.documentElement.style.colorScheme = t;
+          const m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute('content', COLOR[t] || COLOR.light);
         };
         apply(pref());
         window.__setTheme = (t) => {
@@ -164,6 +176,9 @@ const jsonLd =
         }
       })();
     </script>
+
+    <!-- Per-page <head> extras (e.g. extra JSON-LD). -->
+    <slot name="head" />
 
     <ClientRouter />
   </head>

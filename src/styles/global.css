@@ -32,7 +32,9 @@
   --kbd-bg: #fafbfc;
 
   /* Typography */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  /* "Inter Variable" 是 @fontsource 注册的真实 family 名；务必与之一致，否则
+     自托管/预加载的 Inter 不会被使用，正文会静默回退到系统无衬线字体。 */
+  --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC",
     sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Cascadia Code",
@@ -431,6 +433,27 @@ hr {
   border: 1px solid var(--border);
 }
 
+/* Build-time Mermaid (src/lib/rehype-mermaid-build.mjs): each diagram ships as
+   two static SVGs — .beoe-light / .beoe-dark — and we show the one matching the
+   site's manual [data-theme]. No mermaid runtime is sent to the browser. */
+.prose figure.beoe {
+  margin-block: 1.6em;
+  text-align: center;
+}
+.prose figure.beoe img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+}
+:root[data-theme='dark'] .beoe-light {
+  display: none;
+}
+:root:not([data-theme='dark']) .beoe-dark {
+  display: none;
+}
+
 .prose blockquote {
   margin-block: 1.5em;
   padding: 0.2em 0 0.2em 1.2em;
@@ -491,32 +514,6 @@ hr {
   width: fit-content;
   min-width: 100%;
   counter-reset: none;
-}
-
-/* Mermaid diagrams — emitted as <pre.mermaid> by remark-mermaid, rendered to
-   SVG on the client. Before render (or with JS off) the source stays visible as
-   a readable monospace block; once mermaid runs it sets [data-processed]. */
-.prose pre.mermaid {
-  margin-block: 1.6em;
-  padding: 1.15rem;
-  border: 1px solid var(--code-border);
-  border-radius: var(--radius);
-  background: var(--code-bg);
-  overflow-x: auto;
-  font-family: var(--font-mono);
-  font-size: 0.82em;
-  line-height: 1.6;
-  color: var(--text-soft);
-  white-space: pre;
-}
-.prose pre.mermaid[data-processed] {
-  text-align: center;
-  white-space: normal;
-  color: inherit;
-}
-.prose pre.mermaid svg {
-  max-width: 100%;
-  height: auto;
 }
 
 /* Enhanced code block: wrapper adds a header bar (language + copy). Built

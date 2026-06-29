@@ -7,6 +7,8 @@ const posts = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    // 可选的最后更新日期；填写后文章页与结构化数据会展示「更新于」。
+    updated: z.coerce.date().optional(),
     description: z.string().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),

@@ -1,7 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { AUTHOR } from '../lib/site';
+import { AUTHOR, SITE } from '../lib/site';
 import { withBase } from '../lib/url';
+
+// Person structured data — helps search engines build an author knowledge panel
+// and ties the site's content back to a single identity (sameAs).
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: AUTHOR.name,
+  url: new URL(withBase('/about'), SITE.origin).href,
+  email: `mailto:${AUTHOR.email}`,
+  jobTitle: '前端工程师',
+  description: SITE.description,
+  sameAs: [AUTHOR.github],
+};
 
 const stack = [
   { name: 'Astro', note: '内容驱动的静态站点' },
@@ -19,6 +32,7 @@ const principles = [
 ];
 ---
 <BaseLayout title="关于" description="关于 zlog：一名在意工程质量与长期价值的前端工程师。">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(personLd)} />
   <div class="page-head">
     <p class="eyebrow mono">// about</p>
     <h1>关于</h1>

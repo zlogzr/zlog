@@ -8,7 +8,6 @@ import ProseEnhancer from '../../components/ProseEnhancer.astro';
 import PrevNext from '../../components/PrevNext.astro';
 import SeriesNav from '../../components/SeriesNav.astro';
 import RelatedNotes from '../../components/RelatedNotes.astro';
-import Mermaid from '../../components/Mermaid.astro';
 import ShareButton from '../../components/ShareButton.astro';
 import { withBase, tagUrl } from '../../lib/url';
 import { formatDate, isoDateTime, readingTime } from '../../lib/format';
@@ -44,6 +43,7 @@ const toItem = (p: typeof post | null) =>
   description={post.data.description}
   type="article"
   date={post.data.date}
+  updated={post.data.updated}
   tags={post.data.tags}
   image={`/og/${post.id}.png`}
   breadcrumbs={[
@@ -63,6 +63,12 @@ const toItem = (p: typeof post | null) =>
         <time class="mono" datetime={isoDateTime(post.data.date)}>{formatDate(post.data.date)}</time>
         <span class="sep" aria-hidden="true">·</span>
         <span>{minutes} 分钟阅读</span>
+        {post.data.updated && (
+          <>
+            <span class="sep" aria-hidden="true">·</span>
+            <span>更新于 <time class="mono" datetime={isoDateTime(post.data.updated)}>{formatDate(post.data.updated)}</time></span>
+          </>
+        )}
         {post.data.tags.length > 0 && (
           <span class="post-tags">
             {post.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
@@ -79,7 +85,6 @@ const toItem = (p: typeof post | null) =>
   <PrevNext prev={toItem(older)} next={toItem(newer)} />
   <Comments />
   <a class="back" href={withBase('/posts')}><span class="arrow">←</span> 返回博客</a>
-  <Mermaid />
 </BaseLayout>
 
 <style>
