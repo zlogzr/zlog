@@ -52,6 +52,7 @@ const toItem = (n: typeof note | null) =>
   date={note.data.updated}
   updated={note.data.updated}
   tags={[note.data.category]}
+  image={`/og/${note.id}.png`}
 >
   <ReadingProgress />
   <TableOfContents headings={headings} />

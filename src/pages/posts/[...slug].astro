@@ -44,6 +44,7 @@ const toItem = (p: typeof post | null) =>
   type="article"
   date={post.data.date}
   tags={post.data.tags}
+  image={`/og/${post.id}.png`}
 >
   <ReadingProgress />
   <TableOfContents headings={headings} />

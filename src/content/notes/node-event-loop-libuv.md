@@ -9,7 +9,7 @@ seriesOrder: 1
 related: [event-loop-microtasks, node-cluster-worker-threads]
 ---
 
-事件循环的核心思想（一个宏任务 + 清空微任务）浏览器和 Node 一致（见「事件循环：宏任务、微任务与渲染时机」）。但 Node 的循环跑在 **libuv** 上，结构更细，几个差异常坑人。
+事件循环的核心思想（一个宏任务 + 清空微任务）浏览器和 Node 一致（见 [[event-loop-microtasks|事件循环：宏任务、微任务与渲染时机]]）。但 Node 的循环跑在 **libuv** 上，结构更细，几个差异常坑人。
 
 ## Node 的循环分阶段
 
@@ -44,6 +44,6 @@ console.log('sync');
 ## 两个实战结论
 
 - **别滥用 `process.nextTick` 递归**：它在阶段切换前就被清空，无限递归会**饿死 I/O**——文件读不进来、请求收不到，进程看着活着实则假死。要让出，用 `setImmediate`。
-- **CPU 密集任务会阻塞整个循环**：Node 是单线程跑 JS。一段同步的大循环 / JSON 解析超大对象 / 同步加密，会卡住**所有**连接。这类活该丢给 `worker_threads` 或拆成异步分片（见「进程模型」一条）。
+- **CPU 密集任务会阻塞整个循环**：Node 是单线程跑 JS。一段同步的大循环 / JSON 解析超大对象 / 同步加密，会卡住**所有**连接。这类活该丢给 `worker_threads` 或拆成异步分片（见 [[node-cluster-worker-threads|Node 多核]]）。
 
 > 浏览器的事件循环还要操心「什么时候渲染一帧」；Node 没有渲染，但多了 I/O 阶段和 `nextTick` 这层。把「分阶段 + nextTick 插队」记住，Node 里那些诡异的执行顺序就讲得通了。

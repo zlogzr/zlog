@@ -338,6 +338,24 @@ hr {
 .prose a:hover {
   text-decoration-color: var(--accent);
 }
+/* Inline wiki links ([[slug]]) — a subtle dotted underline distinguishes
+   in-site knowledge links from regular external links. */
+.prose a.wikilink {
+  text-decoration-style: dotted;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.prose a.wikilink::before {
+  content: '⇲';
+  font-size: 0.72em;
+  margin-right: 0.12em;
+  color: var(--accent);
+  opacity: 0.7;
+}
+.prose .wikilink-broken {
+  color: var(--text-faint);
+  text-decoration: underline dotted color-mix(in srgb, #e03131 60%, transparent);
+  cursor: help;
+}
 
 .prose :is(ul, ol) {
   padding-left: 1.4em;

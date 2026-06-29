@@ -48,10 +48,23 @@ category: 分类名      # 知识库按这个分组
 description: 一句话说明（可选）
 updated: 2026-06-24   # 可选
 order: 1              # 同分类内排序，越小越靠前
+series: 系列名         # 可选，归入某条学习路径（可跨博客 / 知识库）
+seriesOrder: 1        # 系列内顺序，从 1 连续递增
+related: [slug-a, slug-b]  # 可选，相关条目（反向链接自动反推）
 ---
 ```
 
 写完照常 `git push`，约 1–2 分钟后自动上线，**搜索索引、RSS、站点地图都会自动更新**，无需手动操作。
+
+### 把内容连成网：系列 / 双向链接 / 图谱
+
+内容多了之后，靠这三样把它们串起来（博客与知识库视为同一张图）：
+
+- **系列（series）**：同名 `series` 的条目按 `seriesOrder` 串成一条**有序学习路径**，文章顶部显示「第 N / M 篇」，[/series](https://zlogzr.github.io/zlog/series) 有总览。
+- **双向链接**：`related` 写出链，**反向链接自动反推**，都显示在文末。正文里也可写 `[[slug]]` 或 `[[slug|自定义文字]]` 内联成链。
+- **知识图谱**：[/graph](https://zlogzr.github.io/zlog/graph) 把 `related` 关系画成可交互的关系图。
+
+> **内容校验**：`related` / `series` / `[[wikilink]]` 关系图由[构建时校验](src/lib/validate-content.mjs)兜底——slug 写错、`seriesOrder` 撞号、wikilink 指向不存在的条目，**都会让构建失败**。本地随时可跑 `npm run validate`。
 
 ## 设计与架构
 
@@ -86,8 +99,16 @@ order: 1              # 同分类内排序，越小越靠前
 ### 🔎 SEO 与分享
 - 每页输出 canonical、Open Graph、Twitter Card、以及 JSON-LD 结构化数据（文章为 `BlogPosting`）。
 - 站点地图由 `@astrojs/sitemap` 自动生成，[robots.txt](public/robots.txt) 指向它。
-- **社交分享卡片**：[public/og.png](public/og.png)（1200×630）。要改版重新生成时，可编辑卡片 HTML 后用无头浏览器截图，例如：
-  `chrome --headless --window-size=1200,630 --screenshot=public/og.png file:///path/to/card.html`。
+- **社交分享卡片（每篇自动生成）**：每篇文章 / 笔记在构建时用 [satori](https://github.com/vercel/satori) + [resvg](https://github.com/yisibl/resvg-js)
+  生成专属的 1200×630 PNG（带标题、分类、站名），无需无头浏览器。源码：[src/pages/og/[...slug].png.ts](src/pages/og/[...slug].png.ts)。
+  - 中文字形来自 [src/assets/og/cjk-subset.woff](src/assets/og/)：一份**按现有标题用字裁剪过**的极小子集字体（OFL 的 Noto Sans SC）。
+  - 若新标题用到子集里没有的生僻字，构建会**警告**（`[og-font]`）。届时下载一份源字体后重新生成子集：
+    ```bash
+    curl -L -o /tmp/notosc.otf \
+      https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf
+    npm run og:font -- /tmp/notosc.otf
+    ```
+  - 首页等非文章页仍用 [public/og.png](public/og.png) 作默认卡片。
 
 ### 📡 RSS 订阅
 - 地址：**https://zlogzr.github.io/zlog/rss.xml** （页脚也有入口）。只收录博客文章，按时间倒序。
