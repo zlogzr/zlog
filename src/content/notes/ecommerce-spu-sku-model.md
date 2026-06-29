@@ -4,6 +4,9 @@ category: 电商
 description: “iPhone 15” 是 SPU，“iPhone 15 / 蓝色 / 256G” 才是 SKU。分不清这一层，库存和价格全乱。
 updated: 2026-06-29
 order: 1
+series: 电商系统设计
+seriesOrder: 1
+related: [ecommerce-sku-attributes]
 ---
 
 电商建模的第一道坎，是把「商品」这个含糊的词拆成两层。拆错了，后面的库存、价格、下单全是补丁。

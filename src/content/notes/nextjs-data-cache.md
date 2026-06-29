@@ -4,6 +4,9 @@ category: Next.js
 description: App Router 里 fetch 不再是你认识的那个 fetch。它默认带缓存与去重——不懂这点会被“数据不更新”坑惨。
 updated: 2026-06-29
 order: 3
+series: Next.js 全栈
+seriesOrder: 3
+related: [nextjs-rendering-modes, nextjs-server-actions]
 ---
 
 App Router 最反直觉的一点：它**扩展了全局 `fetch`**。同样一行 `await fetch(url)`，行为和浏览器 / 旧 Node 里的不一样——它默认会缓存、会去重。这是「数据怎么也不更新」一类问题的头号原因。

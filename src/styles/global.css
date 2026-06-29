@@ -416,6 +416,32 @@ hr {
   counter-reset: none;
 }
 
+/* Mermaid diagrams — emitted as <pre.mermaid> by remark-mermaid, rendered to
+   SVG on the client. Before render (or with JS off) the source stays visible as
+   a readable monospace block; once mermaid runs it sets [data-processed]. */
+.prose pre.mermaid {
+  margin-block: 1.6em;
+  padding: 1.15rem;
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  line-height: 1.6;
+  color: var(--text-soft);
+  white-space: pre;
+}
+.prose pre.mermaid[data-processed] {
+  text-align: center;
+  white-space: normal;
+  color: inherit;
+}
+.prose pre.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Enhanced code block: wrapper adds a header bar (language + copy). Built
    client-side by ProseEnhancer so no-JS still gets a clean <pre>. */
 .code-block {

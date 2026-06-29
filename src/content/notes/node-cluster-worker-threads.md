@@ -4,6 +4,9 @@ category: Node.js
 description: Node 单线程跑 JS，吃不满多核。用多进程扛并发、用 worker 线程扛 CPU——两者解决的问题不同。
 updated: 2026-06-29
 order: 3
+series: Node.js 服务端
+seriesOrder: 3
+related: [node-event-loop-libuv]
 ---
 
 Node 跑 JS 是单线程的。一台 16 核机器，默认只用 1 核。怎么用满？要先分清你缺的是哪种能力。

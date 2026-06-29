@@ -1,0 +1,122 @@
+---
+import type { Entry } from '../lib/collections';
+
+interface Props {
+  related: Entry[];
+  backlinks: Entry[];
+}
+const { related, backlinks } = Astro.props;
+const kindLabel = (k: Entry['kind']) => (k === 'post' ? '文章' : '笔记');
+---
+{(related.length > 0 || backlinks.length > 0) && (
+  <nav class="links" aria-label="相关与反向链接">
+    {related.length > 0 && (
+      <section class="links-group">
+        <h2 class="links-title"><span class="mono hash">#</span> 相关</h2>
+        <ul>
+          {related.map((e) => (
+            <li>
+              <a href={e.href}>
+                <span class="link-kind mono">{kindLabel(e.kind)}</span>
+                <span class="link-title">{e.title}</span>
+                {e.description && <span class="link-desc">{e.description}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    {backlinks.length > 0 && (
+      <section class="links-group">
+        <h2 class="links-title"><span class="mono hash">←</span> 被这些引用</h2>
+        <ul>
+          {backlinks.map((e) => (
+            <li>
+              <a href={e.href}>
+                <span class="link-kind mono">{kindLabel(e.kind)}</span>
+                <span class="link-title">{e.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </nav>
+)}
+
+<style>
+  .links {
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 720px) {
+    .links:has(.links-group + .links-group) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .links-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: var(--step-0);
+    color: var(--text-soft);
+    margin: 0 0 0.6rem;
+    border: 0;
+    padding: 0;
+  }
+  .hash {
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .links-group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.3rem;
+  }
+  .links-group a {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 0.2rem 0.6rem;
+    padding: 0.55rem 0.7rem;
+    margin: 0 -0.7rem;
+    border-radius: var(--radius);
+    color: var(--text);
+    transition: background var(--dur-fast) var(--ease);
+  }
+  .links-group a:hover {
+    background: var(--bg-subtle);
+  }
+  .link-kind {
+    grid-row: 1;
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0 0.45rem;
+    line-height: 1.7;
+    align-self: center;
+  }
+  .links-group a:hover .link-kind {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+  }
+  .link-title {
+    grid-row: 1;
+    font-weight: 550;
+  }
+  .links-group a:hover .link-title {
+    color: var(--accent);
+  }
+  .link-desc {
+    grid-column: 2;
+    grid-row: 2;
+    color: var(--text-soft);
+    font-size: var(--step--1);
+  }
+</style>

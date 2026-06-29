@@ -4,6 +4,9 @@ category: React
 description: key 不是“消除 warning 的咒语”，它是你告诉 React“这一项还是不是上次那一项”的唯一线索。
 updated: 2026-06-29
 order: 2
+series: React 进阶
+seriesOrder: 2
+related: [react-fiber-reconciliation]
 ---
 
 渲染列表时不写 `key`，React 会警告你。大多数人于是随手补一个 `key={index}`，警告没了，bug 来了。

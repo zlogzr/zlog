@@ -4,6 +4,9 @@ category: React
 description: RSC 不是“更好的 SSR”。它是把组件树切成“服务端只跑一次”和“客户端可交互”两半。
 updated: 2026-06-29
 order: 7
+series: React 进阶
+seriesOrder: 9
+related: [nextjs-app-vs-pages-router, react-suspense-error-boundary]
 ---
 
 React Server Components（RSC）最容易被误解成「SSR 的升级版」。它们解决的是不同的问题。先把概念分清。

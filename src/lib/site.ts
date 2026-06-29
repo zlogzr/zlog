@@ -29,5 +29,6 @@ export const AUTHOR = {
 export const NAV = [
   { href: '/posts', label: '博客' },
   { href: '/notes', label: '知识库' },
+  { href: '/series', label: '系列' },
   { href: '/about', label: '关于' },
 ] as const;

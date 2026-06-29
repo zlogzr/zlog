@@ -4,6 +4,9 @@ category: Next.js
 description: 不是所有逻辑都属于组件。需要纯 API 端点用 Route Handler；需要“请求到达页面前先拦一下”用 Middleware。
 updated: 2026-06-29
 order: 5
+series: Next.js 全栈
+seriesOrder: 5
+related: [routing-auth-guards]
 ---
 
 App Router 里大部分取数在服务端组件里直接做。但有两类活儿不属于组件：**对外提供一个纯 HTTP 端点**，和**在请求抵达任何页面之前统一拦截**。它们分别对应 Route Handler 和 Middleware。

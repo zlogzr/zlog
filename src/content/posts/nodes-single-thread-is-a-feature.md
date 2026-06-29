@@ -4,6 +4,9 @@ date: 2026-06-26
 description: "‘Node 单线程，所以不行’是个流传很广的半截真话。它在 I/O 上单线程反而是优势，在 CPU 上才是软肋。分清这两者，选型就不会拍脑袋。"
 tags: ["Node.js", "工程", "思考"]
 draft: false
+series: Node.js 服务端
+seriesOrder: 5
+related: [node-event-loop-libuv, node-cluster-worker-threads]
 ---
 
 「Node 是单线程的，所以扛不住高并发」——这句话我听过无数遍，且每次都觉得它对了一半、错了一半。它把「单线程」当成一个笼统的缺点，而真相是：**单线程在某类负载下是 Node 最大的优势，在另一类负载下才是它的软肋。** 不分清这两类，关于 Node 的所有讨论都是鸡同鸭讲。

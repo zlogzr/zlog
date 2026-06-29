@@ -4,6 +4,9 @@ category: React
 description: 状态管理的第一问题不是“用哪个库”，而是“这块状态该住在哪一层”。先答对这个。
 updated: 2026-06-29
 order: 6
+series: React 进阶
+seriesOrder: 8
+related: [react-server-components]
 ---
 
 「该用 Redux 还是 Zustand 还是 Context」是个被问错的问题。先回答更前面的一个问题：**这块状态应该住在组件树的哪一层？** 放对了层，大多数时候根本用不上状态库。

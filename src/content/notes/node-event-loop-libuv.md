@@ -4,6 +4,9 @@ category: Node.js
 description: 浏览器只有“宏任务 + 微任务”；Node 的循环分成有序的几个阶段，还多了 process.nextTick。
 updated: 2026-06-29
 order: 1
+series: Node.js 服务端
+seriesOrder: 1
+related: [event-loop-microtasks, node-cluster-worker-threads]
 ---
 
 事件循环的核心思想（一个宏任务 + 清空微任务）浏览器和 Node 一致（见「事件循环：宏任务、微任务与渲染时机」）。但 Node 的循环跑在 **libuv** 上，结构更细，几个差异常坑人。

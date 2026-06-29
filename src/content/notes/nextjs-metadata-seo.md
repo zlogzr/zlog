@@ -4,6 +4,9 @@ category: Next.js
 description: SEO 和社交分享靠的是每页正确的 title / description / og 图。App Router 用 Metadata API 把它做成数据，而非手插标签。
 updated: 2026-06-29
 order: 6
+series: Next.js 全栈
+seriesOrder: 6
+related: [nextjs-data-cache, core-web-vitals]
 ---
 
 一个商品页被分享到微信、发到搜索引擎，长什么样，取决于它的 `<title>`、`description`、和 Open Graph 标签。App Router 不让你手动往 `<head>` 里插标签，而是用 **Metadata API**——把元数据声明成数据，框架负责渲染。

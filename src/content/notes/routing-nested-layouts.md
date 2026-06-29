@@ -4,6 +4,9 @@ category: 路由
 description: 切换子页面时，外层导航、侧边栏不该重新渲染、不该丢状态。嵌套布局就是为这个而生。
 updated: 2026-06-29
 order: 4
+series: React 数据与路由
+seriesOrder: 4
+related: [react-router-data-apis, data-fetching-waterfalls]
 ---
 
 一个后台应用：左侧菜单常驻，右侧内容随路由切换。切换右侧时，左侧菜单**不该重新渲染、不该丢掉滚动位置和展开状态**。实现这个体验的机制，就是嵌套路由 + 共享布局。

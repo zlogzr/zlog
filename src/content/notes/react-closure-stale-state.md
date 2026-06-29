@@ -4,6 +4,9 @@ category: React
 description: 每次 render 都是一帧快照，函数闭包捕获的是那一帧的 state。理解这点，一半的 hooks bug 自解。
 updated: 2026-06-29
 order: 3
+series: React 进阶
+seriesOrder: 3
+related: [react-useeffect-dependencies, react-fiber-reconciliation]
 ---
 
 ```jsx

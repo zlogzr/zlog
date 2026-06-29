@@ -4,6 +4,9 @@ category: 电商
 description: 颜色 ×尺码 = 所有组合，但真实在售的只是子集。把“全集”和“实际 SKU”分清，选择器才好做。
 updated: 2026-06-29
 order: 2
+series: 电商系统设计
+seriesOrder: 2
+related: [ecommerce-spu-sku-model, ecommerce-sku-selector]
 ---
 
 一个 SPU 有几个销售属性（颜色、尺码……），每个属性有几个值。**所有可能的组合 = 各属性值的笛卡尔积**。但真正在售的 SKU，通常只是这个全集的**一个子集**。

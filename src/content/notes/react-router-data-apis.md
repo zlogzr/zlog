@@ -4,6 +4,9 @@ category: 路由
 description: 路由不只是“哪个 URL 渲染哪个组件”。数据路由让路由也负责“进页面前先取数、提交时怎么写”。
 updated: 2026-06-29
 order: 1
+series: React 数据与路由
+seriesOrder: 1
+related: [data-fetching-waterfalls, react-router-defer-streaming]
 ---
 
 老式的 React Router 只管一件事：URL → 组件。取数据是组件**挂载之后**在 `useEffect` 里自己发请求。React Router 6.4+（及 Remix）引入的**数据路由**，把「取数」和「写入」也变成了路由的职责。

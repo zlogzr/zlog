@@ -4,6 +4,9 @@ category: React
 description: 输入框的值，是 React state 说了算，还是 DOM 自己说了算？这个选择决定了你的表单怎么写。
 updated: 2026-06-29
 order: 9
+series: React 进阶
+seriesOrder: 5
+related: [nextjs-server-actions, react-19-actions]
 ---
 
 表单是 React 里最容易写乱的地方，乱的根源往往是没想清一个问题：**这个输入框的当前值，到底由谁持有？** 答案只有两个，对应两种模式。

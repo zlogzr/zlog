@@ -4,6 +4,9 @@ category: Next.js
 description: 一个标了 'use server' 的函数，能从客户端直接调，框架替你生成 RPC。方便，但安全边界要自己守。
 updated: 2026-06-29
 order: 4
+series: Next.js 全栈
+seriesOrder: 4
+related: [nextjs-data-cache, ecommerce-price-trust]
 ---
 
 传统全栈写法：前端发请求 → 写一个 API 路由 → 校验 → 操作数据库 → 返回。Server Actions 把这套折叠成一个**函数**。

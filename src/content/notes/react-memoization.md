@@ -4,6 +4,9 @@ category: React
 description: 它们不是“加上就更快”的咒语。多数时候是噪音；少数几个场景里是必需。分清这几个场景。
 updated: 2026-06-29
 order: 5
+series: React 进阶
+seriesOrder: 6
+related: [react-fiber-reconciliation]
 ---
 
 到处包 `useMemo`、`useCallback`，是 React 代码里最常见的「假优化」。它们本身有成本（额外的函数、依赖数组比较、占内存），无脑加反而更慢、更难读。

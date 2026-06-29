@@ -4,6 +4,9 @@ category: Next.js
 description: 同一个页面在“何时生成 HTML”上有几种选择。选错了，要么数据陈旧，要么服务器白扛压力。
 updated: 2026-06-29
 order: 2
+series: Next.js 全栈
+seriesOrder: 2
+related: [nextjs-data-cache, react-suspense-error-boundary, core-web-vitals]
 ---
 
 「渲染模式」回答的是一个问题：**这个页面的 HTML 是什么时候生成的？** 不同答案对应不同的速度 / 新鲜度 / 成本权衡。

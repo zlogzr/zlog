@@ -4,6 +4,9 @@ category: Node.js
 description: try/catch 只对同步调用栈有效。异步错误跨了 tick，栈早没了——你得在它发生的地方接住。
 updated: 2026-06-29
 order: 4
+series: Node.js 服务端
+seriesOrder: 4
+related: [react-suspense-error-boundary]
 ---
 
 ```js

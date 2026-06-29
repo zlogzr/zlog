@@ -4,6 +4,9 @@ category: 电商
 description: 选了“红色”，就该自动把没货的尺码置灰。这背后是一个“基于已选项做可达性判断”的小算法。
 updated: 2026-06-29
 order: 3
+series: 电商系统设计
+seriesOrder: 3
+related: [ecommerce-sku-attributes, ecommerce-spu-sku-model]
 ---
 
 详情页上选颜色、选尺码的那个组件，看着简单，做对不易。核心需求：**用户每选一个值，其他属性里「凑不出在售 SKU」的值要自动置灰**，避免用户辛苦选完才发现没货。

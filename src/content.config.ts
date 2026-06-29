@@ -10,6 +10,11 @@ const posts = defineCollection({
     description: z.string().optional(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
+    // 系列 / 学习路径：同名 series 的条目（可跨博客与知识库）按 seriesOrder 串成有序路径
+    series: z.string().optional(),
+    seriesOrder: z.number().optional(),
+    // 相关条目：指向其它条目的 id（注意 notes 的 id 即文件名，posts 同理），用于双向链接
+    related: z.array(z.string()).default([]),
   }),
 });
 
@@ -23,6 +28,11 @@ const notes = defineCollection({
     updated: z.coerce.date().optional(),
     order: z.number().default(0),
     draft: z.boolean().default(false),
+    // 系列 / 学习路径：同名 series 的条目（可跨博客与知识库）按 seriesOrder 串成有序路径
+    series: z.string().optional(),
+    seriesOrder: z.number().optional(),
+    // 相关条目：指向其它条目的 id，用于双向链接（反向链接由构建时自动反推）
+    related: z.array(z.string()).default([]),
   }),
 });
 

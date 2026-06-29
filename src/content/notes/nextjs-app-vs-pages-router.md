@@ -4,6 +4,9 @@ category: Next.js
 description: 不只是目录名变了。App Router 默认是 Server Component，整套数据获取与渲染心智都换了。
 updated: 2026-06-29
 order: 1
+series: Next.js 全栈
+seriesOrder: 1
+related: [react-server-components]
 ---
 
 Next.js 现在有两套路由系统并存。新项目用 **App Router**（`app/` 目录），但老项目和大量教程还停在 **Pages Router**（`pages/` 目录）。差别远不止文件夹名字。

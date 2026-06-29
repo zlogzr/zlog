@@ -6,8 +6,12 @@ import TableOfContents from '../../components/TableOfContents.astro';
 import ReadingProgress from '../../components/ReadingProgress.astro';
 import ProseEnhancer from '../../components/ProseEnhancer.astro';
 import PrevNext from '../../components/PrevNext.astro';
+import SeriesNav from '../../components/SeriesNav.astro';
+import RelatedNotes from '../../components/RelatedNotes.astro';
+import Mermaid from '../../components/Mermaid.astro';
 import { withBase, tagUrl } from '../../lib/url';
 import { formatDate, isoDateTime, readingTime } from '../../lib/format';
+import { getAllEntries, getConnections } from '../../lib/collections';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
@@ -27,6 +31,10 @@ const { post, newer, older } = Astro.props;
 const { Content, headings } = await render(post);
 const minutes = readingTime(post.body ?? '');
 
+const entries = await getAllEntries();
+const self = entries.find((e) => e.kind === 'post' && e.id === post.id)!;
+const { series, seriesIndex, related, backlinks } = getConnections(self, entries);
+
 const toItem = (p: typeof post | null) =>
   p ? { href: withBase(`/posts/${p.id}`), title: p.data.title } : null;
 ---
@@ -39,6 +47,7 @@ const toItem = (p: typeof post | null) =>
 >
   <ReadingProgress />
   <TableOfContents headings={headings} />
+  {series && <SeriesNav series={series} currentId={post.id} index={seriesIndex} />}
 
   <article class="prose" data-pagefind-body>
     <header class="post-header">
@@ -58,9 +67,11 @@ const toItem = (p: typeof post | null) =>
   </article>
 
   <ProseEnhancer />
+  <RelatedNotes related={related} backlinks={backlinks} />
   <PrevNext prev={toItem(older)} next={toItem(newer)} />
   <Comments />
   <a class="back" href={withBase('/posts')}><span class="arrow">←</span> 返回博客</a>
+  <Mermaid />
 </BaseLayout>
 
 <style>

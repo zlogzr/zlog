@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import pagefind from 'astro-pagefind';
+import remarkMermaid from './src/lib/remark-mermaid.mjs';
 
 // GitHub Pages 子路径部署：站点根域名 + 项目子路径
 export default defineConfig({
@@ -10,6 +11,8 @@ export default defineConfig({
   // 注意：pagefind 需放在最后，它依赖其它集成已完成构建
   integrations: [sitemap(), pagefind()],
   markdown: {
+    // 把 ```mermaid 转成原始 HTML，需在 Shiki 高亮前运行（remark 阶段先于 rehype）
+    remarkPlugins: [remarkMermaid],
     shikiConfig: {
       // 双主题：浅色 github-light，深色 github-dark。
       // defaultColor: false → 每个 token 同时输出 --shiki-light / --shiki-dark

@@ -4,6 +4,9 @@ date: 2026-06-27
 description: "前端这些年悄悄把一个老问题忘了——代码到底在哪台机器上运行。Server Components 把它重新摆回了桌面，而这其实是件好事。"
 tags: ["前端", "React", "思考"]
 draft: false
+series: React 进阶
+seriesOrder: 11
+related: [react-server-components, nextjs-app-vs-pages-router]
 ---
 
 写前端写久了，会渐渐忘掉一个很基本的问题：**我这段代码，到底跑在哪台机器上？** 因为答案一直很简单——浏览器。数据从某个 API 来，但渲染、状态、交互，全在用户的浏览器里。服务器只是个发静态文件、偶尔回个 JSON 的角色。

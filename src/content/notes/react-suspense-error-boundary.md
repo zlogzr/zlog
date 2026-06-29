@@ -4,6 +4,9 @@ category: React
 description: 加载中和出错，是每个异步 UI 的两种必然状态。Suspense 和 Error Boundary 把它们从散落的 if 里提出来，变成边界。
 updated: 2026-06-29
 order: 8
+series: React 进阶
+seriesOrder: 7
+related: [nextjs-rendering-modes, react-router-defer-streaming, node-error-handling]
 ---
 
 任何要取数据的 UI，都逃不开三种状态：**加载中、出错了、成功了**。传统写法是在每个组件里用 `if (loading)` / `if (error)` 手动分支，散得到处都是。React 提供了两个「边界」组件，把前两种状态**声明式**地抽出来。

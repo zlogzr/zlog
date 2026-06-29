@@ -4,6 +4,9 @@ date: 2026-06-29
 description: "从 useEffect 到 loader 再到服务端组件，React 这几年最大的变化不是渲染，而是‘什么时候、在哪里取数据’。这条线索串起来，很多新概念就不再零散。"
 tags: ["前端", "React", "思考"]
 draft: false
+series: React 数据与路由
+seriesOrder: 6
+related: [react-router-data-apis, react-server-components]
 ---
 
 如果你这两年断续地学 React，大概会有种被概念淹没的感觉：Suspense、loader、Server Components、Server Actions、各种缓存……它们像是各自冒出来的新玩意。但把它们摆在一条时间线上看，会发现其实是**同一个问题被反复回答**：取数据，到底该在什么时候、在哪台机器上发生？

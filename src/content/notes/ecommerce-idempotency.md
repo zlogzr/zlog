@@ -4,6 +4,9 @@ category: 电商
 description: 网络会重试、用户会重复点击、回调会重发。同一个操作执行多次，结果必须和执行一次一样——这就是幂等。
 updated: 2026-06-29
 order: 8
+series: 电商系统设计
+seriesOrder: 8
+related: [ecommerce-order-state-machine, ecommerce-inventory-oversell]
 ---
 
 电商里凡是涉及钱和库存的写操作，都绕不开一个词：**幂等**。意思是——**同一个请求执行一次和执行多次，结果完全相同**。听起来抽象，但它对应的是每天都在发生的真实场景。

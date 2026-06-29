@@ -4,6 +4,9 @@ category: React
 description: React 19 把“提交表单 → pending → 错误 → 乐观更新”这套样板做成了一等公民。少写很多手动 state。
 updated: 2026-06-29
 order: 10
+series: React 进阶
+seriesOrder: 10
+related: [nextjs-server-actions, react-memoization]
 ---
 
 React 19 的主题之一，是把「异步提交」这件每个表单都要做的事，从一堆手写 state 升级成内置能力。以前你得自己管 `isPending`、`error`、提交后刷新——现在有专门的原语。

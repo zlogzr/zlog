@@ -4,6 +4,8 @@ category: Node.js
 description: 流的全部意义在于“边读边处理”。背压是消费者对生产者说“慢点，我还没处理完”。
 updated: 2026-06-29
 order: 2
+series: Node.js 服务端
+seriesOrder: 2
 ---
 
 处理一个 10GB 的文件，`fs.readFile` 会把它整个读进内存——内存爆掉。流（Stream）的存在就是为了**分块、边读边处理**，内存占用恒定。

@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
+import { getAllEntries, getSeries } from '../../lib/collections';
+
+export async function getStaticPaths() {
+  const entries = await getAllEntries();
+  return getSeries(entries).map((s) => ({
+    params: { series: s.name },
+    props: { series: s },
+  }));
+}
+
+const { series } = Astro.props;
+const kindLabel = (k: string) => (k === 'post' ? '文章' : '笔记');
+---
+<BaseLayout
+  title={`系列：${series.name}`}
+  description={`「${series.name}」学习路径，共 ${series.items.length} 篇。`}
+>
+  <div class="page-head">
+    <p class="eyebrow mono"><a href={withBase('/series')}>// 系列</a></p>
+    <h1>{series.name}</h1>
+    <p class="lede">按顺序读下去的学习路径，共 {series.items.length} 篇。</p>
+  </div>
+
+  <ol class="path">
+    {series.items.map((e, i) => (
+      <li class="step" data-reveal>
+        <span class="step-idx mono">{String(i + 1).padStart(2, '0')}</span>
+        <a class="step-link" href={e.href}>
+          <span class="step-top">
+            <span class="step-kind mono">{kindLabel(e.kind)}</span>
+            <span class="step-title">{e.title}</span>
+          </span>
+          {e.description && <span class="step-desc">{e.description}</span>}
+        </a>
+      </li>
+    ))}
+  </ol>
+
+  <a class="back" href={withBase('/series')}><span class="arrow">←</span> 所有系列</a>
+</BaseLayout>
+
+<style>
+  .path {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    align-items: stretch;
+  }
+  .step-idx {
+    display: grid;
+    place-items: start center;
+    padding-top: 0.95rem;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: var(--step--1);
+    position: relative;
+  }
+  /* connecting line between steps */
+  .step:not(:last-child) .step-idx::after {
+    content: '';
+    position: absolute;
+    top: 2.4rem;
+    bottom: -0.5rem;
+    width: 2px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+  .step-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+  .step-link:hover {
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .step-top {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+  }
+  .step-kind {
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0 0.45rem;
+    line-height: 1.7;
+  }
+  .step-title {
+    font-weight: 600;
+  }
+  .step-link:hover .step-title {
+    color: var(--accent);
+  }
+  .step-desc {
+    color: var(--text-soft);
+    font-size: var(--step--1);
+  }
+</style>

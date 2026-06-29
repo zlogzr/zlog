@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
+import { getAllEntries, getSeries } from '../../lib/collections';
+
+const entries = await getAllEntries();
+const series = getSeries(entries);
+---
+<BaseLayout
+  title="系列"
+  description="把分散的笔记与文章，串成有顺序的学习路径。"
+>
+  <div class="page-head">
+    <p class="eyebrow mono">// learning paths</p>
+    <h1>系列 / 学习路径</h1>
+    <p class="lede">把分散的知识点，按依赖与难度串成可以一路读下去的路径。共 {series.length} 个系列。</p>
+  </div>
+
+  {series.length === 0 && <p class="empty">还没有系列。</p>}
+
+  <div class="series-grid">
+    {series.map((s) => (
+      <section class="card" data-reveal>
+        <header class="card-head">
+          <h2>
+            <a href={withBase(`/series/${encodeURIComponent(s.name)}`)}>{s.name}</a>
+          </h2>
+          <span class="count mono">{s.items.length} 篇</span>
+        </header>
+        <ol class="mini">
+          {s.items.slice(0, 5).map((e, i) => (
+            <li>
+              <span class="idx mono">{String(i + 1).padStart(2, '0')}</span>
+              <a href={e.href}>{e.title}</a>
+            </li>
+          ))}
+          {s.items.length > 5 && (
+            <li class="more">
+              <a href={withBase(`/series/${encodeURIComponent(s.name)}`)}>
+                还有 {s.items.length - 5} 篇 →
+              </a>
+            </li>
+          )}
+        </ol>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .empty {
+    color: var(--text-soft);
+  }
+  .series-grid {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 680px) {
+    .series-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    padding: 1.2rem 1.3rem;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+  .card:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+  }
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.7rem;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-size: var(--step-1);
+  }
+  .card-head h2 a {
+    color: var(--text);
+  }
+  .card-head h2 a:hover {
+    color: var(--accent);
+  }
+  .count {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 0 0.5rem;
+    line-height: 1.7;
+  }
+  .mini {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .mini li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    font-size: var(--step-0);
+  }
+  .idx {
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    flex-shrink: 0;
+  }
+  .mini a {
+    color: var(--text-soft);
+  }
+  .mini a:hover {
+    color: var(--accent);
+  }
+  .more a {
+    color: var(--accent);
+    font-size: var(--step--1);
+  }
+</style>

@@ -4,6 +4,9 @@ category: 路由
 description: 页面慢，很多时候是请求被排成了串：A 回来才发 B，B 回来才发 C。把它们拍平成并行，往往立竿见影。
 updated: 2026-06-29
 order: 2
+series: React 数据与路由
+seriesOrder: 2
+related: [react-router-data-apis]
 ---
 
 页面加载慢，第一反应常是「接口慢」。但很多时候，单个接口都不慢，慢的是它们被**排成了一条串行的瀑布**——一个请求回来，才发起下一个。

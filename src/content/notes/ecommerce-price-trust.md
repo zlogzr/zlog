@@ -4,6 +4,9 @@ category: 电商
 description: 下单时金额必须由服务端用 SKU 重新计算。任何从客户端传上来的价格都是攻击面。
 updated: 2026-06-29
 order: 5
+series: 电商系统设计
+seriesOrder: 5
+related: [nextjs-server-actions, ecommerce-cart-consistency]
 ---
 
 电商安全里最低级、却最常被犯的错误：**下单接口接受前端传来的价格**。这等于把收银台交给顾客自己填金额。

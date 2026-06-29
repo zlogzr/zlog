@@ -4,6 +4,9 @@ category: React
 description: render 不是“画到屏幕”，而是算出差异；commit 才动 DOM。两个阶段分开，才有可中断的渲染。
 updated: 2026-06-29
 order: 1
+series: React 进阶
+seriesOrder: 1
+related: [react-key-and-diff, react-closure-stale-state]
 ---
 
 很多人把 React 的 "render" 理解成「把组件画到屏幕上」，这是误会的源头。React 的一次更新分成**两个阶段**：

@@ -4,6 +4,9 @@ category: 电商
 description: 加车时存的不能是“价格快照”，得是 skuId + 数量。价格、库存、上下架都会在你结算前悄悄变。
 updated: 2026-06-29
 order: 6
+series: 电商系统设计
+seriesOrder: 6
+related: [ecommerce-spu-sku-model, ecommerce-inventory-oversell, ecommerce-price-trust]
 ---
 
 购物车看着是个列表，难点全在「**车里的东西和真实世界会脱节**」：你昨天加的购物车，今天价格变了、库存没了、商品下架了。设计购物车，本质是设计「如何处理这种脱节」。

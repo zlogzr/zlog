@@ -4,6 +4,9 @@ category: 电商
 description: “查一下还有货 → 然后扣减”这两步之间，别人可能已经把货抢走了。超卖几乎都源于这个缝隙。
 updated: 2026-06-29
 order: 4
+series: 电商系统设计
+seriesOrder: 4
+related: [ecommerce-idempotency, ecommerce-order-state-machine]
 ---
 
 库存扣减是电商最容易出事的地方。问题的根源永远是同一个：**「检查」和「扣减」之间有缝隙**，高并发下多个请求挤进这条缝，就超卖了。

@@ -4,6 +4,9 @@ category: React
 description: 别拿 useEffect 当 componentDidMount。它的真正语义是“让外部世界与某段 state 保持同步”。
 updated: 2026-06-29
 order: 4
+series: React 进阶
+seriesOrder: 4
+related: [react-closure-stale-state]
 ---
 
 从类组件转过来的人，习惯把 `useEffect(fn, [])` 当成 `componentDidMount`、把带依赖的当 `componentDidUpdate`。这个类比会带你写出一堆别扭的代码。

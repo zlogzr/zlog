@@ -4,6 +4,9 @@ category: 路由
 description: 页面里有快数据也有慢数据时，不必等齐。先渲染快的，慢的用 Suspense 占位、好了再补。
 updated: 2026-06-29
 order: 3
+series: React 数据与路由
+seriesOrder: 3
+related: [react-suspense-error-boundary, nextjs-rendering-modes]
 ---
 
 loader「进页面前取齐数据」有个副作用：**它会等齐所有数据才渲染**。如果页面里混着快数据（商品基本信息，50ms）和慢数据（评论、推荐，800ms），整页就被那 800ms 拖着——明明商品信息早就能显示了。

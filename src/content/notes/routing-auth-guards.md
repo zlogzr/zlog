@@ -4,6 +4,9 @@ category: 路由
 description: 「未登录跳登录页」是路由守卫的活，但它只防君子。真正的访问控制，必须在每个数据接口上再做一遍。
 updated: 2026-06-29
 order: 5
+series: React 数据与路由
+seriesOrder: 5
+related: [nextjs-route-handlers-middleware, nextjs-server-actions, ecommerce-price-trust]
 ---
 
 「这个页面要登录才能看」「这个操作只有管理员能做」——几乎每个应用都要做访问控制。路由层能帮你把未授权的人挡在页面外，但有一条铁律不能忘：**前端的路由守卫只是体验，不是安全。**
