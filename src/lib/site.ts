@@ -30,6 +30,5 @@ export const NAV = [
   { href: '/posts', label: '博客' },
   { href: '/notes', label: '知识库' },
   { href: '/series', label: '系列' },
-  { href: '/graph', label: '图谱' },
   { href: '/about', label: '关于' },
 ] as const;

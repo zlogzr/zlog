@@ -56,13 +56,12 @@ related: [slug-a, slug-b]  # 可选，相关条目（反向链接自动反推）
 
 写完照常 `git push`，约 1–2 分钟后自动上线，**搜索索引、RSS、站点地图都会自动更新**，无需手动操作。
 
-### 把内容连成网：系列 / 双向链接 / 图谱
+### 把内容连成网：系列 / 双向链接
 
-内容多了之后，靠这三样把它们串起来（博客与知识库视为同一张图）：
+内容多了之后，靠这两样把它们串起来（博客与知识库视为同一张图）：
 
 - **系列（series）**：同名 `series` 的条目按 `seriesOrder` 串成一条**有序学习路径**，文章顶部显示「第 N / M 篇」，[/series](https://zlogzr.github.io/zlog/series) 有总览。
 - **双向链接**：`related` 写出链，**反向链接自动反推**，都显示在文末。正文里也可写 `[[slug]]` 或 `[[slug|自定义文字]]` 内联成链。
-- **知识图谱**：[/graph](https://zlogzr.github.io/zlog/graph) 把 `related` 关系画成可交互的关系图。
 
 > **内容校验**：`related` / `series` / `[[wikilink]]` 关系图由[构建时校验](src/lib/validate-content.mjs)兜底——slug 写错、`seriesOrder` 撞号、wikilink 指向不存在的条目，**都会让构建失败**。本地随时可跑 `npm run validate`。
 

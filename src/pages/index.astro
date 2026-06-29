@@ -17,22 +17,15 @@ const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =
   a.localeCompare(b, 'zh'),
 );
 
-// Series + graph stats for the homepage.
+// Series stats for the homepage.
 const entries = await getAllEntries();
 const series = getSeries(entries);
 const featuredSeries = series.slice(0, 3);
-const edgeKeys = new Set<string>();
-const ids = new Set(entries.map((e) => e.id));
-for (const e of entries) {
-  for (const rel of e.related) {
-    if (ids.has(rel)) edgeKeys.add([e.id, rel].sort().join('::'));
-  }
-}
 const stats = [
   { n: allPosts.length, label: '篇文章' },
   { n: notes.length, label: '条笔记' },
   { n: series.length, label: '个系列' },
-  { n: edgeKeys.size, label: '条连接' },
+  { n: categories.length, label: '个分类' },
 ];
 ---
 
@@ -108,16 +101,6 @@ const stats = [
       <p class="card-desc">把分散的内容串成有序的学习路径。</p>
       <p class="card-meta mono">{series.length} 条路径</p>
       <span class="card-foot">浏览全部 <span class="arrow">→</span></span>
-    </a>
-
-    <a class="card" href={withBase('/graph')}>
-      <div class="card-icon">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="5" cy="6" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="19" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="18" r="2.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 7l10 1.5M7.5 16l1-7M11 17l6-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-      </div>
-      <h2>知识图谱</h2>
-      <p class="card-desc">把内容按引用关系画成一张可交互的图。</p>
-      <p class="card-meta mono">{edgeKeys.size} 条连接</p>
-      <span class="card-foot">去看看 <span class="arrow">→</span></span>
     </a>
   </section>
 
