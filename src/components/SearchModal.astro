@@ -9,7 +9,7 @@ const jsSrc = withBase('/pagefind/pagefind-ui.js');
 const bundlePath = withBase('/pagefind/');
 ---
 <link rel="stylesheet" href={cssHref} />
-<dialog id="search-dialog" class="search-dialog" aria-label="站内搜索" transition:persist="search-dialog">
+<dialog id="search-dialog" class="search-dialog" aria-label="站内搜索">
   <div class="sd-inner">
     <div class="sd-head">
       <span class="sd-hint mono">搜索博客与知识库</span>
@@ -139,6 +139,29 @@ const bundlePath = withBase('/pagefind/');
     document.addEventListener('click', (e) => {
       const d = dialog();
       if (d && d.open && e.target === d) d.close();
+    });
+
+    // Clicking a result navigates — close the dialog in the capture phase, i.e.
+    // before the router (a bubble-phase listener) snapshots the page, so the
+    // open modal never appears over the destination.
+    document.addEventListener(
+      'click',
+      (e) => {
+        const d = dialog();
+        if (d && d.open && e.target.closest && e.target.closest('#search-dialog a')) d.close();
+      },
+      true,
+    );
+
+    // The dialog is NOT persisted across View Transitions: an open modal in the
+    // top layer would bleed over the next page. Close it before any swap, and
+    // re-init Pagefind on the fresh (recreated) dialog after navigating.
+    document.addEventListener('astro:before-swap', () => {
+      const d = dialog();
+      if (d && d.open) d.close();
+    });
+    document.addEventListener('astro:after-swap', () => {
+      inited = false;
     });
   })();
 </script>
