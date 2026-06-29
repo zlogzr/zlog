@@ -202,17 +202,39 @@ const isActive = (p: string) =>
 </style>
 
 <script>
-  // Add a hairline + shadow once the page scrolls. Guarded so View Transitions
-  // don't stack duplicate listeners on the persisted header.
-  if (!(window as any).__headerScrollBound) {
-    (window as any).__headerScrollBound = true;
+  // The header is transition:persist'd, so its server-rendered state carries
+  // across client navigations and won't update on its own. Re-sync the two
+  // things that depend on the current page/scroll after every navigation.
+  if (!(window as any).__headerBound) {
+    (window as any).__headerBound = true;
+
     const onScroll = () => {
       document
         .getElementById('site-header')
         ?.classList.toggle('scrolled', window.scrollY > 8);
     };
+
+    // Highlight the nav link matching the current URL. hrefs already include
+    // the base path; pathname does too, so they compare directly. Trailing
+    // slash is handled by the startsWith branch.
+    const syncActiveNav = () => {
+      const path = location.pathname.replace(/\/$/, '') || '/';
+      document.querySelectorAll<HTMLAnchorElement>('#site-header .nav-link').forEach((a) => {
+        const href = (a.getAttribute('href') || '').replace(/\/$/, '') || '/';
+        const active = href !== '/' && (path === href || path.startsWith(href + '/'));
+        a.classList.toggle('active', active);
+        if (active) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      });
+    };
+
     onScroll();
+    syncActiveNav();
     window.addEventListener('scroll', onScroll, { passive: true });
-    document.addEventListener('astro:after-swap', onScroll);
+    // astro:page-load fires on initial load and after each view transition.
+    document.addEventListener('astro:page-load', () => {
+      onScroll();
+      syncActiveNav();
+    });
   }
 </script>
