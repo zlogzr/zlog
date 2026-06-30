@@ -38,4 +38,19 @@ const notes = defineCollection({
   }),
 });
 
-export const collections = { posts, notes };
+// TIL（Today I Learned）：短小、带日期的随手记。比博客轻、比知识库碎——
+// 一个命令、一个 API、一个当天踩到又解决掉的坑，记一句话就够。
+const til = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/til' }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+    // 可选的出处链接（MDN、规范、issue 等）。
+    source: z.string().optional(),
+    sourceLabel: z.string().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { posts, notes, til };

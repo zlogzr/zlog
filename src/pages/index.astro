@@ -5,6 +5,7 @@ import { withBase, tagUrl } from '../lib/url';
 import { AUTHOR } from '../lib/site';
 import { formatDate } from '../lib/format';
 import { getAllEntries, getSeries } from '../lib/collections';
+import { PROJECTS } from '../lib/projects';
 
 const allPosts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -17,6 +18,10 @@ const categories = [...new Set(notes.map((n) => n.data.category))].sort((a, b) =
   a.localeCompare(b, 'zh'),
 );
 
+const tils = (await getCollection('til', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
 // Series stats for the homepage.
 const entries = await getAllEntries();
 const series = getSeries(entries);
@@ -24,8 +29,8 @@ const featuredSeries = series.slice(0, 3);
 const stats = [
   { n: allPosts.length, label: '篇文章' },
   { n: notes.length, label: '条笔记' },
+  { n: tils.length, label: '条随手记' },
   { n: series.length, label: '个系列' },
-  { n: categories.length, label: '个分类' },
 ];
 ---
 
@@ -93,13 +98,25 @@ const stats = [
       <span class="card-foot">浏览全部 <span class="arrow">→</span></span>
     </a>
 
-    <a class="card" href={withBase('/series')}>
+    <a class="card" href={withBase('/projects')}>
       <div class="card-icon">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h2>系列</h2>
-      <p class="card-desc">把分散的内容串成有序的学习路径。</p>
-      <p class="card-meta mono">{series.length} 条路径</p>
+      <h2>作品</h2>
+      <p class="card-desc">做过、在做的项目——角色、选型与啃下的硬骨头。</p>
+      <p class="card-meta mono">{PROJECTS.length} 个项目</p>
+      <span class="card-foot">浏览全部 <span class="arrow">→</span></span>
+    </a>
+
+    <a class="card" href={withBase('/til')}>
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M13 2 3 14h8l-1 8 10-12h-8Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>随手记</h2>
+      <p class="card-desc">Today I Learned——一个命令、一个 API、一个坑。</p>
+      <p class="card-meta mono">
+        {tils.length} 条{tils[0] && <> · 最新 {formatDate(tils[0].data.date)}</>}
+      </p>
       <span class="card-foot">浏览全部 <span class="arrow">→</span></span>
     </a>
   </section>

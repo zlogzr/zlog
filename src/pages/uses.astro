@@ -1,0 +1,140 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// 我的「装备」清单（/uses）。纯数据，改这里即可。
+// 每组是一类工具；item 写名字，note 写为什么选它 / 怎么用。
+const groups: { title: string; intro?: string; items: { name: string; note: string }[] }[] = [
+  {
+    title: '编辑器与终端',
+    items: [
+      { name: 'VS Code', note: '主力编辑器。配置尽量克制，靠 Vim 键位 + 少量必要插件，不堆插件。' },
+      { name: 'Cursor / Copilot', note: 'AI 结对。用它写样板和探路，但每一行都要我读懂才合并。' },
+      { name: 'iTerm2 + zsh', note: '终端配 starship 主题，常用命令做了 alias，减少手指开销。' },
+      { name: 'lazygit', note: '日常 git 操作的 TUI，比记一堆命令快，复杂操作仍回命令行。' },
+    ],
+  },
+  {
+    title: '前端技术栈',
+    intro: '选型偏保守：优先成熟、文档好、社区活跃的，把新鲜感留给副业。',
+    items: [
+      { name: 'TypeScript', note: '默认语言。类型即文档，能在编译期挡住的错绝不留到运行时。' },
+      { name: 'React + Next.js', note: '主力框架。清楚 RSC、缓存与渲染模式的边界，不滥用。' },
+      { name: 'Astro', note: '内容站首选——本站就是它做的。能少发 JS 就少发。' },
+      { name: 'Tailwind / CSS Variables', note: '工具类提效，配合 design token 与 @layer 管住层叠。' },
+      { name: 'React Query', note: '服务端状态交给它，把缓存、重试、失效这些脏活收口。' },
+    ],
+  },
+  {
+    title: '工程化与质量',
+    items: [
+      { name: 'pnpm', note: '包管理。硬链接省空间，工作区管 monorepo 干净。' },
+      { name: 'Vite', note: '构建与本地开发，启动快、生态好。' },
+      { name: 'ESLint + Prettier', note: '风格交给工具，省下 code review 里的口水。' },
+      { name: 'Vitest / Playwright', note: '单测跑逻辑，E2E 守关键链路，不盲目堆覆盖率。' },
+      { name: 'GitHub Actions', note: 'CI/CD。push 即检查即部署，门禁卡在合并前。' },
+    ],
+  },
+  {
+    title: '设计与调试',
+    items: [
+      { name: 'Figma', note: '看稿、量间距、抠 token。也用它和设计对齐设计系统。' },
+      { name: 'Chrome DevTools', note: '性能面板、Coverage、Lighthouse 是日常，不只是 console.log。' },
+      { name: 'Excalidraw', note: '画架构、理思路。想不清楚的事，画出来往往就清楚了。' },
+    ],
+  },
+  {
+    title: '硬件与习惯',
+    items: [
+      { name: 'MacBook Pro', note: '主力机。开发、写作、跑构建都在它上面。' },
+      { name: '外接显示器', note: '一块横屏写代码、一块竖屏看文档/日志，上下文切换少很多。' },
+      { name: '机械键盘', note: '每天敲八小时的东西，值得对手指好一点。' },
+    ],
+  },
+];
+---
+<BaseLayout
+  title="装备"
+  description="我的开发装备与技术取舍 —— 编辑器、技术栈、工程化工具与一些习惯。选型偏保守，重在稳和可维护。"
+>
+  <div class="page-head">
+    <p class="eyebrow mono">// uses</p>
+    <h1>装备</h1>
+    <p class="lede">
+      常有人问我用什么工具。这里一次列清楚——以及更重要的，<strong>为什么这么选</strong>。
+      我的取舍一贯偏保守：优先成熟、稳定、可维护的，把折腾留在副业里。
+    </p>
+  </div>
+
+  <div class="groups">
+    {groups.map((g) => (
+      <section class="group" data-reveal>
+        <h2 class="group-title">{g.title}</h2>
+        {g.intro && <p class="group-intro">{g.intro}</p>}
+        <ul class="items">
+          {g.items.map((it) => (
+            <li class="item">
+              <span class="item-name">{it.name}</span>
+              <span class="item-note">{it.note}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .groups {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .group-title {
+    font-size: var(--step-1);
+    margin: 0 0 0.3rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .group-intro {
+    margin: 0.5rem 0 0.9rem;
+    color: var(--text-soft);
+    font-size: var(--step--1);
+    line-height: 1.7;
+  }
+  .items {
+    list-style: none;
+    margin: 0.7rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.4rem 1rem;
+    align-items: baseline;
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius);
+    transition: background var(--dur-fast) var(--ease);
+  }
+  .item:hover {
+    background: var(--bg-subtle);
+  }
+  .item-name {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .item-note {
+    color: var(--text-soft);
+    font-size: var(--step-0);
+    line-height: 1.7;
+  }
+  @media (max-width: 560px) {
+    .item {
+      grid-template-columns: 1fr;
+      gap: 0.1rem;
+    }
+    .item-name {
+      color: var(--accent);
+    }
+  }
+</style>

@@ -1,0 +1,144 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase, tagUrl } from '../lib/url';
+import { formatDate } from '../lib/format';
+
+// TIL stream — newest first. Bodies are short, so we render them all inline
+// rather than minting a detail page per entry.
+const items = (await getCollection('til', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const rendered = await Promise.all(
+  items.map(async (e) => ({ entry: e, Content: (await render(e)).Content })),
+);
+
+// Group by year for light visual rhythm.
+const byYear = new Map<number, typeof rendered>();
+for (const r of rendered) {
+  const y = r.entry.data.date.getFullYear();
+  if (!byYear.has(y)) byYear.set(y, []);
+  byYear.get(y)!.push(r);
+}
+const years = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
+---
+<BaseLayout
+  title="TIL · 随手记"
+  description="Today I Learned —— 比博客轻、比知识库碎。一个命令、一个 API、一个当天踩到又解决掉的坑。"
+>
+  <div class="page-head">
+    <p class="eyebrow mono">// today I learned</p>
+    <h1>随手记</h1>
+    <p class="lede">
+      工作里随手学到、又怕过两天就忘的小东西——一个 CSS 属性、一个命令、一个 API、一个坑。
+      不成篇，但攒起来都是手感。共 {items.length} 条。
+    </p>
+  </div>
+
+  {years.map(([year, group]) => (
+    <section class="year" data-reveal>
+      <h2 class="year-title"><span class="mono">{year}</span><span class="year-count">{group.length} 条</span></h2>
+      <ul class="til-list">
+        {group.map(({ entry, Content }) => (
+          <li class="til">
+            <div class="til-head">
+              <time class="til-date mono" datetime={entry.data.date.toISOString()}>
+                {formatDate(entry.data.date)}
+              </time>
+              {entry.data.tags.length > 0 && (
+                <div class="til-tags">
+                  {entry.data.tags.map((t) => <a class="tag" href={tagUrl(t)}>{t}</a>)}
+                </div>
+              )}
+            </div>
+            <h3 class="til-title">{entry.data.title}</h3>
+            <div class="til-body prose">
+              <Content />
+            </div>
+            {entry.data.source && (
+              <p class="til-source">
+                来源：<a href={entry.data.source} target="_blank" rel="noopener noreferrer">
+                  {entry.data.sourceLabel ?? entry.data.source} ↗
+                </a>
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</BaseLayout>
+
+<style>
+  .year {
+    margin-bottom: var(--space-7);
+  }
+  .year-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    font-size: var(--step-2);
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+    margin: 0 0 1.2rem;
+  }
+  .year-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-faint);
+  }
+  .til-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  .til {
+    padding: 1.3rem 1.4rem;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+  .til:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    border-left-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+  .til-head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+  }
+  .til-date {
+    color: var(--text-faint);
+    font-size: var(--step--1);
+  }
+  .til-tags {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .til-title {
+    margin: 0 0 0.6rem;
+    font-size: var(--step-1);
+  }
+  .til-body {
+    font-size: var(--step-0);
+  }
+  /* Tighten the prose rhythm inside a card. */
+  .til-body :global(p:first-child) {
+    margin-top: 0;
+  }
+  .til-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+  .til-source {
+    margin: 0.9rem 0 0;
+    font-size: var(--step--1);
+    color: var(--text-faint);
+  }
+</style>
