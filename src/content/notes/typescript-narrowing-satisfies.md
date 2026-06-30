@@ -2,8 +2,11 @@
 title: 类型收窄与 satisfies
 category: TypeScript
 description: 让 TS 在分支里自动推断更精确的类型，以及用 satisfies 校验而不丢失字面量。
-updated: 2026-06-28
-order: 1
+updated: 2026-06-30
+order: 6
+series: TypeScript 类型系统
+seriesOrder: 5
+related: [ts-generics, ts-conditional-infer]
 ---
 
 ## 类型收窄（narrowing）
