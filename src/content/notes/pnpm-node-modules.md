@@ -4,6 +4,8 @@ category: 工程化
 description: 内容寻址存储 + 硬链接，以及它如何顺手堵掉「幽灵依赖」。
 updated: 2026-06-28
 order: 4
+series: 前端工程化
+seriesOrder: 4
 ---
 
 npm / yarn 的经典 `node_modules` 有两个老毛病：**占空间**（每个项目复制一份所有依赖）和**幽灵依赖**（扁平化后，你能 import 到自己没声明的包）。pnpm 用两招把它们都解决了。

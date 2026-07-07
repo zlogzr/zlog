@@ -4,6 +4,8 @@ category: 工程化
 description: ^ 和 ~ 到底放行哪些升级，以及 lockfile 为什么必须进版本库。
 updated: 2026-06-28
 order: 3
+series: 前端工程化
+seriesOrder: 3
 ---
 
 ## 语义化版本 semver

@@ -4,6 +4,8 @@ category: 工程化
 description: 静态的 ESM 与动态的 CJS 差在哪，以及互操作为什么总出问题。
 updated: 2026-06-28
 order: 1
+series: 前端工程化
+seriesOrder: 1
 ---
 
 | | ESM | CommonJS |

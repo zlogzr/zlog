@@ -1,9 +1,11 @@
 ---
 title: 关键渲染路径：从字节到像素
-category: 浏览器
+category: 性能
 description: 浏览器拿到 HTML 后，到底经过哪几步才把像素画到屏幕上。
 updated: 2026-06-28
 order: 1
+series: Web 性能
+seriesOrder: 1
 ---
 
 浏览器把代码变成画面，走的是一条相对固定的流水线：

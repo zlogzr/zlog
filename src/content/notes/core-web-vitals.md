@@ -3,7 +3,9 @@ title: Core Web Vitals：LCP / INP / CLS
 category: 性能
 description: 三个核心指标分别量什么、合格线在哪、怎么修。
 updated: 2026-06-28
-order: 1
+order: 2
+series: Web 性能
+seriesOrder: 2
 ---
 
 Google 用三个指标量「真实用户体验」，也直接影响搜索排名。

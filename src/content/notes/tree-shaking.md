@@ -4,6 +4,8 @@ category: 工程化
 description: 摇掉死代码的前提、以及 sideEffects 这个常被忽略的开关。
 updated: 2026-06-28
 order: 2
+series: 前端工程化
+seriesOrder: 2
 ---
 
 Tree-shaking = 打包时**静态分析**出哪些导出从没被用到，把它们从产物里摇掉。
